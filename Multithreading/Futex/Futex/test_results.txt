@@ -1,0 +1,7 @@
+hardware_concurrency : 4
+limit : 10000000
+
+futex nthreads :2 time : 9179ms
+futex nthreads :8 time : 25453ms
+mutex nthreads :2 time : 27841ms
+mutex nthreads :8 time : 37235ms
