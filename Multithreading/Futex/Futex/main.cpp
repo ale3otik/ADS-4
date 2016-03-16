@@ -52,7 +52,6 @@ int main() {
     int64_t nthreads[] = {std::thread::hardware_concurrency() / 2 , std::thread::hardware_concurrency() * 2};
     std::chrono::time_point<std::chrono::system_clock> start, end;
     for(int i = 0; i < 2 ; ++i){
-        futex f;
         start = std::chrono::system_clock::now();
         check<futex>(limit, nthreads[i]);
         end = std::chrono::system_clock::now();
@@ -60,7 +59,6 @@ int main() {
     }
     
     for(int i = 2; i < 4 ; ++i){
-        std::mutex mtx;
         start = std::chrono::system_clock::now();
         check<std::mutex>(limit, nthreads[i%2]);
         end = std::chrono::system_clock::now();
