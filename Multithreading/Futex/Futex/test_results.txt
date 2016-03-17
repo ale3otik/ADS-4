@@ -1,7 +1,44 @@
 hardware_concurrency : 4
 limit : 10000000
 
-futex nthreads :2 time : 9179ms
-futex nthreads :8 time : 25453ms
-mutex nthreads :2 time : 27841ms
-mutex nthreads :8 time : 37235ms
+nthreads :1
+   futex time : 14200ms
+   mutex time : 258ms
+   f/m ratio <55.0388>
+nthreads :2
+   futex time : 9240ms
+   mutex time : 31636ms
+   f/m ratio <0.292072>
+nthreads :3
+   futex time : 14080ms
+   mutex time : 34393ms
+   f/m ratio <0.409386>
+nthreads :4
+   futex time : 14802ms
+   mutex time : 35324ms
+   f/m ratio <0.419035>
+nthreads :5
+   futex time : 24841ms
+   mutex time : 35203ms
+   f/m ratio <0.70565>
+nthreads :6
+   futex time : 24609ms
+   mutex time : 36544ms
+   f/m ratio <0.673407>
+nthreads :7
+   futex time : 25046ms
+   mutex time : 36346ms
+   f/m ratio <0.689099>
+nthreads :8
+   futex time : 25146ms
+   mutex time : 36402ms
+   f/m ratio <0.690786>
+nthreads :9
+   futex time : 25129ms
+   mutex time : 38375ms
+   f/m ratio <0.654827>
+nthreads :10
+   futex time : 24766ms
+   mutex time : 34654ms
+   f/m ratio <0.714665>
+

@@ -47,29 +47,40 @@ void check(int limit , int64_t nthreads) {
 }
 
 int main() {
-    int64_t result_time[4];
+
     const int64_t limit = (int)1e7;
-    int64_t nthreads[] = {std::thread::hardware_concurrency() / 2 , std::thread::hardware_concurrency() * 2};
-    std::chrono::time_point<std::chrono::system_clock> start, end;
-    for(int i = 0; i < 2 ; ++i){
-        start = std::chrono::system_clock::now();
-        check<futex>(limit, nthreads[i]);
-        end = std::chrono::system_clock::now();
-        result_time[i] = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+    const int ntests = 10;
+    
+    vector<int64_t> nthreads(ntests);
+    vector<int64_t> ftime(ntests);
+    vector<int64_t> mtime(ntests);
+    
+    for(int i = 0; i < ntests; ++i) {
+        nthreads[i] = i + 1;
     }
     
-    for(int i = 2; i < 4 ; ++i){
-        start = std::chrono::system_clock::now();
-        check<std::mutex>(limit, nthreads[i%2]);
-        end = std::chrono::system_clock::now();
-        result_time[i] = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+    std::chrono::time_point<std::chrono::system_clock> start, end;
+    for(int test = 0; test < ntests; ++test){
+            start = std::chrono::system_clock::now();
+            check<futex>(limit, nthreads[test]);
+            end = std::chrono::system_clock::now();
+            ftime[test] = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+    
+            start = std::chrono::system_clock::now();
+            check<std::mutex>(limit, nthreads[test]);
+            end = std::chrono::system_clock::now();
+            mtime[test] = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
     }
     
     cout << "hardware_concurrency : " << std::thread::hardware_concurrency() << "\n";
     cout << "limit : " << limit << "\n\n";
     
-    for(int i = 0; i < 4; ++i){
-        cout << (i < 2 ? "futex" : "mutex" ) <<" nthreads :" << nthreads[i%2] << " time : " << result_time[i] << "ms" << endl;
+    for(int i = 0; i < ntests; ++i){
+        cout << "nthreads :"  << nthreads[i] << "\n";
+        cout << ("   futex" ) <<" time : " << ftime[i] << "ms" << endl;
+        cout << ("   mutex" ) <<" time : " << mtime[i] << "ms" << endl;
+        cout <<  "   f/m ratio <" << ftime[i] / (float)mtime[i] << ">" << endl;
+
     }
     
     return 0;
