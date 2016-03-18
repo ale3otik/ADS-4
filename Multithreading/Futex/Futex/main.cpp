@@ -123,10 +123,9 @@ void test_queue() {
     for(int i = 0; i < nthreads; ++i) {
         sum += qnt[i];
     }
-    
-//    cout << (qsize * (qsize+1)) / 2 << "\n";
 
     assert(sum == ((qsize * (qsize+1)) / 2));
+    cout << "queue works" << endl;
 }
 
 int main() {

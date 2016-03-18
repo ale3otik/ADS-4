@@ -1,23 +1,16 @@
 //
-//  sync_queue.hpp
+//  syncq_ueue.hpp
 //  Futex
 //
 //  Created by Alex on 17.03.16.
 //  Copyright © 2016 Alex. All rights reserved.
 //
 
-#ifndef sync_queue_hpp
-#define sync_queue_hpp
+#ifndef syncq_queue_hpp
+#define syncq_queue_hpp
 
-#include <stdio.h>
 #include "futex.hpp"
 #include <queue>
-
-struct EmptyQueueAccesException: public std::exception {
-    const char * what() const throw() {
-        return "queue is empty";
-    }
-};
 
 template<class T>
 class SyncQueue {
@@ -26,84 +19,51 @@ public:
     void push(T elem);
     void pop();
     T getpop();
-    T front();
-    T back();
     size_t size() const;
 private:
-    std::queue<T> _q;
-    futex _ftx;
+    std::queue<T> q_;
+    std::mutex mtx_;
+    std::condition_variable popcv_;
     
 };
 
 
 template <class T>
 SyncQueue<T>::SyncQueue():
-_ftx() {}
+mtx_() {}
 
 template <class T>
 void SyncQueue<T>::push(T elem) {
-    _ftx.lock();
-    _q.push(elem);
-    _ftx.unlock();
+    std::lock_guard<std::mutex> locker(mtx_);
+    q_.push(elem);
+    popcv_.notify_one();
 }
 
 template <class T>
 void SyncQueue<T>::pop() {
-    _ftx.lock();
-    if(_q.size() > 0) {
-        _q.pop();
-        _ftx.unlock();
-    } else {
-        _ftx.unlock();
-        throw new EmptyQueueAccesException();
+    std::unique_lock<std::mutex> locker(mtx_);
+    while(q_.size() == 0) {
+        popcv_.wait(locker);
     }
+    q_.pop();
 }
 
 template <class T>
 T SyncQueue<T>::getpop() {
-    _ftx.lock();
-    if(_q.size() > 0) {
-        T result(_q.front());
-        _q.pop();
-        _ftx.unlock();
-        return result;
-    } else {
-        _ftx.unlock();
-        throw new EmptyQueueAccesException();
+    std::unique_lock<std::mutex> locker(mtx_);
+    while(q_.size() == 0) {
+        popcv_.wait(locker);
     }
-
-}
-template <class T>
-T SyncQueue<T>::front() {
-    _ftx.lock();
     
-    if(_q.size() > 0) {
-        T & elem =_q.front();
-        _ftx.unlock();
-        return elem;
-    }
-    else {
-        _ftx.unlock();
-        throw new EmptyQueueAccesException();
-    }
-}
+    T result(q_.front());
+    q_.pop();
+    return result;
 
-template <class T>
-T SyncQueue<T>::back() {
-    _ftx.lock();
-    if(_q.size() > 0) {
-        T & elem =_q.back();
-        _ftx.unlock();
-    }
-    else {
-        _ftx.unlock();
-        throw new EmptyQueueAccesException();
-    }
 }
 
 template <class T>
 size_t SyncQueue<T>::size() const{
-    return _q.size();
+    return q_.size();
 }
 
-#endif /* sync_queue_hpp */
+#endif /* syncq_queue_hpp */

@@ -22,8 +22,8 @@ public:
     void unlock();
     bool try_lock();
 private:
-    std::atomic<int> _cur_thread_id;
-    int _get_thread_id() const;
+    std::atomic<int64_t> cur_thread_id_;
+    int64_t get_thread_id_() const;
 };
 
 
