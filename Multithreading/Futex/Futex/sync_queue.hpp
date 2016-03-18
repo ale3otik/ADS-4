@@ -16,7 +16,7 @@ template<class T>
 class SyncQueue {
 public:
     SyncQueue();
-    void push(T elem);
+    void push(const T & elem);
     void pop();
     T getpop();
     size_t size() const;
@@ -33,7 +33,7 @@ SyncQueue<T>::SyncQueue():
 mtx_() {}
 
 template <class T>
-void SyncQueue<T>::push(T elem) {
+void SyncQueue<T>::push(const T & elem) {
     std::lock_guard<std::mutex> locker(mtx_);
     q_.push(elem);
     popcv_.notify_one();
