@@ -46,4 +46,3 @@ inline int futex::_get_thread_id() const {
     sstream << std::this_thread::get_id();
     return (int)std::stoll(sstream.str(), nullptr, 16);
 }
-

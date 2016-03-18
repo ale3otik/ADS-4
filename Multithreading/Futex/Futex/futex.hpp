@@ -20,4 +20,6 @@ private:
     std::atomic<int> _cur_thread_id;
     int _get_thread_id() const;
 };
+
+
 #endif /* futex_hpp */
