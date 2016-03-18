@@ -11,6 +11,10 @@
 //- if true, it replaces the contained value with val (like store).
 //- if false, it replaces expected with the contained value .
 
+const char *  BadUnlockException::what() const throw() {
+    return "Wrong lock-unlock sequence";
+}
+
 futex::futex() {
     _cur_thread_id = -1;
 }
@@ -36,7 +40,7 @@ bool futex::try_lock() {
 void futex::unlock() {
     int new_thread = _get_thread_id();
     if(!_cur_thread_id.compare_exchange_weak(new_thread, -1)) {
-        throw new std::exception();
+        throw new BadUnlockException;
     }
 }
 

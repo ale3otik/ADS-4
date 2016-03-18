@@ -12,6 +12,7 @@
 #include <mutex>
 #include <cassert>
 #include <chrono>
+#include <array>
 #include "futex.hpp"
 #include "sync_queue.hpp"
 
@@ -91,29 +92,41 @@ void testA() {
 }
 
 template <class T>
-void test_queue_thread(SyncQueue<T> * q, futex * f, int i) {
-    q->push(i);
-    int qval = q->front();
-    size_t ssize = q->size();
-    q->pop();
-    
-    f->lock();
-    cout <<"i "<<i<< "qval: " << qval << " size : " << ssize << endl;
-    f->unlock();
+void test_queue_thread(SyncQueue<T> * q, int * qnt , int limit) {
+    for(int i = 0; i < limit; ++i) {
+        int qval = q->getpop();
+        *qnt += qval;
+    }
 }
 
 void test_queue() {
     SyncQueue<int> q;
     const int nthreads = 10;
+    const int64_t qsize = 100;
     vector<thread> threads;
-    futex f;
+    for (int i = 1 ; i < qsize + 1; ++i) {
+        q.push(i);
+    }
+
+    vector<int> qnt(nthreads);
     for(int i = 0; i < nthreads; ++i) {
-        threads.push_back(thread(test_queue_thread<int>, &q, &f, i));
+        qnt[i] = 0;
+        int limit = qsize / nthreads;
+        threads.push_back(thread(test_queue_thread<int>, &q, &(qnt[i]), limit));
     }
     
     for(auto & x : threads) {
         x.join();
     }
+    
+    int64_t sum = 0;
+    for(int i = 0; i < nthreads; ++i) {
+        sum += qnt[i];
+    }
+    
+//    cout << (qsize * (qsize+1)) / 2 << "\n";
+
+    assert(sum == ((qsize * (qsize+1)) / 2));
 }
 
 int main() {

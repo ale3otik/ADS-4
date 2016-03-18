@@ -10,6 +10,11 @@
 #define futex_hpp
 #include <thread>
 #include <atomic>
+
+struct BadUnlockException: public std::exception {
+    const char * what() const throw();
+};
+
 class futex {
 public:
     futex();

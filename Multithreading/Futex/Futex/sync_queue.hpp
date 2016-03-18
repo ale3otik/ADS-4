@@ -12,12 +12,20 @@
 #include <stdio.h>
 #include "futex.hpp"
 #include <queue>
+
+struct EmptyQueueAccesException: public std::exception {
+    const char * what() const throw() {
+        return "queue is empty";
+    }
+};
+
 template<class T>
 class SyncQueue {
 public:
     SyncQueue();
     void push(T elem);
     void pop();
+    T getpop();
     T front();
     T back();
     size_t size() const;
@@ -26,6 +34,7 @@ private:
     futex _ftx;
     
 };
+
 
 template <class T>
 SyncQueue<T>::SyncQueue():
@@ -41,23 +50,55 @@ void SyncQueue<T>::push(T elem) {
 template <class T>
 void SyncQueue<T>::pop() {
     _ftx.lock();
-    _q.pop();
-    _ftx.unlock();
+    if(_q.size() > 0) {
+        _q.pop();
+        _ftx.unlock();
+    } else {
+        _ftx.unlock();
+        throw new EmptyQueueAccesException();
+    }
 }
 
 template <class T>
+T SyncQueue<T>::getpop() {
+    _ftx.lock();
+    if(_q.size() > 0) {
+        T result(_q.front());
+        _q.pop();
+        _ftx.unlock();
+        return result;
+    } else {
+        _ftx.unlock();
+        throw new EmptyQueueAccesException();
+    }
+
+}
+template <class T>
 T SyncQueue<T>::front() {
     _ftx.lock();
-    T & elem =_q.front();
-    _ftx.unlock();
-    return elem;
+    
+    if(_q.size() > 0) {
+        T & elem =_q.front();
+        _ftx.unlock();
+        return elem;
+    }
+    else {
+        _ftx.unlock();
+        throw new EmptyQueueAccesException();
+    }
 }
 
 template <class T>
 T SyncQueue<T>::back() {
     _ftx.lock();
-    T & elem =_q.back();
-    _ftx.unlock();
+    if(_q.size() > 0) {
+        T & elem =_q.back();
+        _ftx.unlock();
+    }
+    else {
+        _ftx.unlock();
+        throw new EmptyQueueAccesException();
+    }
 }
 
 template <class T>
