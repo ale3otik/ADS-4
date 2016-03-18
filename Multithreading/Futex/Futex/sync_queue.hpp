@@ -6,12 +6,10 @@
 //  Copyright © 2016 Alex. All rights reserved.
 //
 
-#ifndef syncq_queue_hpp
-#define syncq_queue_hpp
+#ifndef sync_queue_hpp
+#define sync_queue_hpp
 
-#include "futex.hpp"
 #include <queue>
-
 template<class T>
 class SyncQueue {
 public:
@@ -26,7 +24,6 @@ private:
     std::condition_variable popcv_;
     
 };
-
 
 template <class T>
 SyncQueue<T>::SyncQueue():
@@ -58,7 +55,6 @@ T SyncQueue<T>::getpop() {
     T result(q_.front());
     q_.pop();
     return result;
-
 }
 
 template <class T>
@@ -66,4 +62,4 @@ size_t SyncQueue<T>::size() const{
     return q_.size();
 }
 
-#endif /* syncq_queue_hpp */
+#endif /* sync_queue_hpp */
