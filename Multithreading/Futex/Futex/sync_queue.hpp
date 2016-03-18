@@ -13,7 +13,6 @@
 template<class T>
 class SyncQueue {
 public:
-    SyncQueue();
     void push(const T & elem);
     void pop();
     T getpop();
@@ -24,10 +23,6 @@ private:
     std::condition_variable popcv_;
     
 };
-
-template <class T>
-SyncQueue<T>::SyncQueue():
-mtx_() {}
 
 template <class T>
 void SyncQueue<T>::push(const T & elem) {
