@@ -1,3 +1,5 @@
+
+
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -71,7 +73,24 @@ struct Node {
     range dx , dy;
 };
 
+ll get_dist2(const point & a , const point & b) {
+    ll dx = a.x - b.x;
+    ll dy = a.y - b.y;
+    return dx * dx + dy * dy;
+}
 
+range actual_range(const Node & node ,bool xdiv) {
+    return xdiv ?  node.dx : node.dy;
+}
+
+int actual_crd(const point & p , bool xdiv) {
+    return xdiv ? p.x : p.y;
+}
+
+
+
+vector<point> points;
+int best_id;
 class d2_tree {
 public:
     vector<Node> nodes;
@@ -87,51 +106,42 @@ public:
         build_node(0 , pts.begin() , pts.end() - 1 , true , range(ymin , ymax));
     }
     
-    int get_min(int id, range dx, range dy) {
-        Node & cur = nodes[id];
-//        cout << "x" << cur.dx.l << " " << cur.dx.r << " " <<cur.dy.l << " " << cur.dy.r <<endl;
-        if(nonintersect(cur, dx, dy) || cur.min == MAXMIN) return MAXMIN;
-        if(cur.mod != -1) push(cur , cur.mod);
-        cur.mod = -1;
-        
+    void dfs(int id , int pnt_id) {
+        const Node & cur = nodes[id];
+        point pnt = points[pnt_id];
+        point bestp = points[best_id];
+        ll bestdist = get_dist2(bestp,pnt);
         if(cur.children[0] == 0) {
-            if(check(cur.pnt , dx , dy)) return cur.min;
-            return MAXMIN;
+            if(bestdist > get_dist2(cur.pnt, pnt) || (bestdist == get_dist2(cur.pnt, pnt) && cur.pnt.val < best_id)) {
+                if(pnt_id != cur.pnt.val) {
+                    best_id = cur.pnt.val;
+//                    cout << pnt_id << " " << cur.pnt.val<<endl;
+                }
+            }
+            return;
         }
-        if(inside(cur, dx, dy)) return cur.min;
+        Node & child1 = nodes[cur.children[0]];
+        int k = 1;
         
-        int ans = MAXMIN;
+        if(actual_range(child1, cur.xdiv).r >= actual_crd(pnt, cur.xdiv))  {
+            k = 0;
+        }
+        
         loop(i,2) {
-            ans = min(ans , get_min(cur.children[i] , dx , dy));
-        }
-        return ans;
-    }
-    
-    int modify(int id, range dx, range dy, int mod) {
-        Node & cur = nodes[id];
-        if(nonintersect(cur, dx,dy)) return cur.min;
-        if(cur.min == MAXMIN) return MAXMIN;
-        if(cur.children[0] == 0) {
-            if(check(cur.pnt, dx, dy)) {
-                cur.min = mod;
-            }
-            return cur.min;
-        }
-        
-        if(cur.mod != -1) push(cur , cur.mod);
-        
-        cur.mod = -1;
-        if(inside(cur , dx , dy)) {
-            cur.mod = mod;
-            cur.min = mod;
-        } else {
-            cur.min = MAXMIN;
-            loop(i,2) {
-                cur.min = min(cur.min , modify(cur.children[i], dx, dy, mod));
+            bestdist = get_dist2(points[best_id],pnt);
+            int j = (i + k)%2;
+            Node & child = nodes[cur.children[j]];
+            range act_range = actual_range(child, cur.xdiv);
+            ll act_crd = actual_crd(pnt, cur.xdiv);
+            ll dist = min(abs(act_crd - act_range.r) , abs(act_crd - act_range.l));
+            dist = min (dist , min(abs(act_crd + act_range.r) , abs(act_crd + act_range.l)));
+            if((act_crd <= act_range.r && act_crd >= act_range.l)
+               || dist*dist <= bestdist) {
+                dfs(cur.children[j] , pnt_id);
             }
         }
-        return cur.min;
     }
+
     
 private:
     
@@ -153,19 +163,19 @@ private:
         && cur.dy.r <= dy.r && cur.dy.l >= dy.l;
     }
     bool nonintersect(const Node & cur ,range  & dx , range & dy) {
-//        if(!(cur.dx.l > dx.r || cur.dx.r < dx.l
-//            || cur.dy.l > dy.r || cur.dy.r < dy.l)) {
-//            cout << cur.dx.l << " " << cur.dx.r << " " << cur.dy.l<<  " " << cur.dy.r <<"|";
-//            cout << dx.l << " " << dx.r << " " << dy.l<<  " " << dy.r <<endl;
-//        }
+        //        if(!(cur.dx.l > dx.r || cur.dx.r < dx.l
+        //            || cur.dy.l > dy.r || cur.dy.r < dy.l)) {
+        //            cout << cur.dx.l << " " << cur.dx.r << " " << cur.dy.l<<  " " << cur.dy.r <<"|";
+        //            cout << dx.l << " " << dx.r << " " << dy.l<<  " " << dy.r <<endl;
+        //        }
         return cur.dx.l > dx.r || cur.dx.r < dx.l
-            || cur.dy.l > dy.r || cur.dy.r < dy.l;
+        || cur.dy.l > dy.r || cur.dy.r < dy.l;
     }
     
     int build_node(int id , vector<point>::iterator begin ,
                    vector<point>::iterator last ,
                    bool xdiv , range second_d) {
-//        cout << last - begin <<endl;
+        //        cout << last - begin <<endl;
         if(last == begin) {
             nodes[id].dx = range(begin->x , begin->x);
             nodes[id].dy = range(begin->y , begin->y);
@@ -203,61 +213,45 @@ private:
     
 };
 
-void solve() {
-    
-    int n,m;
+void solve2() {
+    int n;
     cin >> n;
-    vector<point> pts(n);
-    loop(i,n) {
-        cin >> pts[i].x >> pts[i].y >> pts[i].val;
+    points.resize(n);
+    loop(i , n) {
+        cin >> points[i].x >> points[i].y;
+        points[i].val = i;
     }
     
     d2_tree tree;
-    tree.build(pts);
-    cin >> m;
-    vector<int> ans;
-    ans.reserve(m);
+    vector<point> ptscpy = points;
+    tree.build(ptscpy);
+    vec<vec<int> > ans(n);
     
-//    cout << tree.nodes.size() <<endl;
-//    loop(i,tree.nodes.size()) {
-//        if(tree.nodes[i].min != MAXMIN && tree.nodes[i].children[0] == 0) {
-//            Node & v = tree.nodes[i];
-//            cout <<"out " <<v.dx.l << " " << v.dx.r << " " << v.dy.l << " " << v.dy.r << endl;
-//        }
-//    }
-    loop(i,m) {
-        char c;
-        cin >> c;
-        range xr , yr;
-        cin >> xr.l >> yr.l >> xr.r >> yr.r;
+    loop(i,n) {
+        best_id = (i == 0 ? 1 : 0);
+        tree.dfs(0 , i);
+        ans[best_id].pb(i);
         
-        if(c == '=') {
-            int val;
-            cin >> val;
-            tree.modify(0, xr, yr, val);
-        } else {
-            ans.pb(tree.get_min(0,xr,yr));
-        }
     }
-    
-    loop(i,ans.size()) {
-        if(ans[i] == MAXMIN) {
-            cout <<"NO\n";
-        } else {
-            cout << ans[i] <<"\n";
+    loop(i,n) {
+        cout << i+1 <<": ";
+        loop(j,ans[i].size()) {
+            cout << ans[i][j] + 1 << " ";
         }
+        cout << "\n";
     }
 }
 
 int main()
 {
 //    freopen("in.txt","r", stdin);
-     freopen("rectmin.in","r", stdin);
-     freopen("rectmin.out","w", stdout);
+     freopen("k.in","r", stdin);
+     freopen("k.out","w", stdout);
     // cout << fixed;
     // cout.precision(3);
-    // ios_base::sync_with_stdio(false);   
     
-    solve();
+    ios_base::sync_with_stdio(false);
+    
+    solve2();
     return 0;
 }
