@@ -36,9 +36,4 @@ struct Triangle {
     /* .. another params ..*/
 };
 
-//struct PolygonShape {
-//    std::vector<Triangle> polygons;
-//};
-
-
 #endif /* Structs_h */

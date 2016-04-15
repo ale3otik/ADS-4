@@ -10,11 +10,13 @@
 #include <fstream>
 #include <cstdlib>
 #include "PPMTransformer.hpp"
+#include "SceneProcessor.hpp"
 #include "Structs.h"
+
 using namespace std;
 int main() {
     vector<Triangle> triangles = PPMTransformer::getShapesFromFile("elements.txt");
-    
-    
+    vector<vector<color> > result = SceneProcessor(triangles).buildScene();
+    PPMTransformer::transformToPPM(result, "out.ppm");
     return 0;
 }
