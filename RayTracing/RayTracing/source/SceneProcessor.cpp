@@ -25,6 +25,6 @@ SceneProcessor & SceneProcessor::setScreenPosition(crd corner , crd a , crd b) {
 }
 
 SceneProcessor & SceneProcessor::setObserverPosition(crd pos) {
-    this->obsr_pos = pos;
+    this->obsr_pos_ = pos;
     return *this;
 }

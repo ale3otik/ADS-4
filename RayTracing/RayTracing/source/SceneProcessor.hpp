@@ -24,7 +24,7 @@ private:
     crd scr_b_;
     crd scr_corner_;
     
-    crd obsr_pos;
+    crd obsr_pos_;
     
 };
 

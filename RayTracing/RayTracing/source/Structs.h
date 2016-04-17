@@ -8,6 +8,7 @@
 
 #ifndef Structs_h
 #define Structs_h
+
 #include <vector>
 
 struct Color {
@@ -27,8 +28,19 @@ struct crd {
         y = y_;
         z = z_;
     }
+    double length() const;
+    
     double x,y,z;
 };
+
+crd operator * (const double & cof , const crd & v);
+crd operator -(const crd & a , const crd & b);
+crd operator +(const crd & a , const crd & b);
+
+crd getNormVec(const crd & v);
+double scal(const crd & a , const crd & b);
+crd mult(const crd & a , const crd & b);
+
 
 struct Ray {
     Ray(){}
@@ -65,8 +77,13 @@ public:
     void setColor(const Color & color);
     
 private:
-    crd vertices[3];
-    Material material;
+    bool is_inside_(const crd & point) const;
+    double get_dist_(const crd & point) const;
+    
+    crd normal_;
+    double D_; // from Ax + By + Cz + D = 0
+    crd vertices_[3];
+    Material material_;
     
     /* .. another params ..*/
 };
