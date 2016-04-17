@@ -9,7 +9,7 @@
 #include "PPMTransformer.hpp"
 #include <cassert>
 typedef long long i64;
-void PPMTransformer::transformToPPM(std::vector<std::vector<color> > data , const std::string & fname) {
+void PPMTransformer::transformToPPM(std::vector<std::vector<Color> > data , const std::string & fname) {
     assert(data.size() > 0);
     i64 ysize = data.size();
     i64 xsize = data[0].size();
@@ -38,11 +38,16 @@ std::vector<Triangle> PPMTransformer::getShapesFromFile(const std::string & fnam
     std::vector<Triangle> result(qnt);
 
     for(int i = 0 ; i < qnt; ++i) {
-        Triangle t;
-        file >> t.color.r >> t.color.g >> t.color.b;
+        Color clr;
+        file >> clr.r >> clr.g >> clr.b;
+        crd vertices[3];
         for(int j = 0; j < 3; ++j) {
-            file >> t.vertices[j].x >> t.vertices[j].y >> t.vertices[j].z;
+            file >> vertices[j].x >> vertices[j].y >> vertices[j].z;
         }
+        
+        Triangle t(vertices);
+        t.setColor(clr);
+        
         result[i] = t;
     }
     return result;

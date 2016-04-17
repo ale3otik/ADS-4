@@ -16,7 +16,7 @@
 
 class PPMTransformer {
 public:
-    static void transformToPPM(std::vector<std::vector<color> > data , const std::string & fname);
+    static void transformToPPM(std::vector<std::vector<Color> > data , const std::string & fname);
     static std::vector<Triangle> getShapesFromFile(const std::string & fname);
 };
 

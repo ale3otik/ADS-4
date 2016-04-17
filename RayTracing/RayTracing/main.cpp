@@ -16,7 +16,7 @@
 using namespace std;
 int main() {
     vector<Triangle> triangles = PPMTransformer::getShapesFromFile("elements.txt");
-    vector<vector<color> > result = SceneProcessor(triangles).buildScene();
-    PPMTransformer::transformToPPM(result, "out.ppm");
+    vector<vector<Color> > result = SceneProcessor(triangles).buildScene();
+//    PPMTransformer::transformToPPM(result, "out.ppm");
     return 0;
 }
