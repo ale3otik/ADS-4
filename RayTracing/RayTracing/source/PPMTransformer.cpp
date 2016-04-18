@@ -1,10 +1,8 @@
-//
 //  PPMTransformer.cpp
 //  RayTracing
 //
 //  Created by Alex on 15.04.16.
 //  Copyright © 2016 Alex. All rights reserved.
-//
 
 #include "PPMTransformer.hpp"
 #include <cassert>
@@ -17,8 +15,11 @@ void PPMTransformer::transformToPPM(std::vector<std::vector<Color> > data , cons
     std::ofstream file(fname);
     assert(file.is_open());
     
-    file << "P3 \n 255 \n";
-    file << xsize << " " << ysize << "\n";
+    
+    file << "P3 \n";
+    file << ysize << " " << xsize << "\n";
+    file << "255 \n";
+    
     for(const auto & line : data) {
         for(const auto & pix : line) {
             file << pix.r << " " << pix.g << " " << pix.b <<"\n";
@@ -28,14 +29,14 @@ void PPMTransformer::transformToPPM(std::vector<std::vector<Color> > data , cons
     file.close();
 }
 
-std::vector<Triangle> PPMTransformer::getShapesFromFile(const std::string & fname) {
+std::vector<std::shared_ptr<Shape> > PPMTransformer::getShapesFromFile(const std::string & fname) {
     std::ifstream file(fname);
     assert(file.is_open());
     
     int qnt;
     file >> qnt;
     assert(qnt > 0);
-    std::vector<Triangle> result(qnt);
+    std::vector<std::shared_ptr<Shape> > result(qnt);
 
     for(int i = 0 ; i < qnt; ++i) {
         Color clr;
@@ -45,10 +46,11 @@ std::vector<Triangle> PPMTransformer::getShapesFromFile(const std::string & fnam
             file >> vertices[j].x >> vertices[j].y >> vertices[j].z;
         }
         
-        Triangle t(vertices);
-        t.setColor(clr);
+        std::shared_ptr<Triangle> t(new Triangle(vertices));
+        t->setColor(clr);
         
         result[i] = t;
     }
+    
     return result;
 }

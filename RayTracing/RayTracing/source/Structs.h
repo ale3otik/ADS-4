@@ -11,6 +11,7 @@
 
 #include <vector>
 
+
 struct Color {
     Color(){};
     Color(int  r_ , int g_ , int b_) {
@@ -29,13 +30,15 @@ struct crd {
         z = z_;
     }
     double length() const;
-    
+    double len2() const;
     double x,y,z;
 };
 
 crd operator * (const double & cof , const crd & v);
 crd operator -(const crd & a , const crd & b);
 crd operator +(const crd & a , const crd & b);
+
+crd solveMatrix3(const std::vector<crd> & columns , crd b);
 
 crd getNormVec(const crd & v);
 double scal(const crd & a , const crd & b);
@@ -44,10 +47,7 @@ crd mult(const crd & a , const crd & b);
 
 struct Ray {
     Ray(){}
-    Ray(const crd & pt_ , const crd & dir_) {
-        dir = dir_;
-        pt = pt_;
-    }
+    Ray(const crd & pt_ , const crd & dir_);
     
     crd dir;
     crd pt;
@@ -60,7 +60,7 @@ public:
 
 class Shape {
 public:
-    virtual std::pair<bool, crd> getIntersection(const Ray & ray) const = 0;
+    virtual std::pair<bool, double> getIntersection(const Ray & ray) const = 0;
     virtual crd getNormal(const crd & point) const = 0;
     virtual Color getColor() const = 0;
     virtual void setColor(const Color & color) = 0;
@@ -71,7 +71,7 @@ public:
     Triangle(){};
     Triangle(crd vertices_[3]);
     
-    std::pair<bool , crd> getIntersection(const Ray & ray) const;
+    std::pair<bool , double> getIntersection(const Ray & ray) const;
     crd getNormal(const crd & point) const;
     Color getColor() const;
     void setColor(const Color & color);

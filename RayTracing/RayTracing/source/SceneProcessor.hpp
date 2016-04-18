@@ -13,19 +13,22 @@
 
 class SceneProcessor {
 public:
-    SceneProcessor(const std::vector<Triangle> & data);
-    SceneProcessor & setScreenPosition(crd corner , crd a , crd b);
+    SceneProcessor(const std::vector<std::shared_ptr<Shape> > & data);
+    SceneProcessor & setScreenPosition(crd corner , crd a , crd b, int width , int height);
     SceneProcessor & setObserverPosition(crd pos);
     std::vector<std::vector<Color> > buildScene();
 private:
-    std::vector<Triangle> data_;
+    std::vector<std::shared_ptr<Shape> > shapes_;
     
     crd scr_a_;
     crd scr_b_;
     crd scr_corner_;
+    int width_;
+    int height_;
     
     crd obsr_pos_;
     
+    Color trace_ray_(const Ray & ray) const;
 };
 
 #endif /* SceneProcessor_hpp */
