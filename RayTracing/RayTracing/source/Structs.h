@@ -14,7 +14,7 @@
 
 struct Color {
     Color(){};
-    Color(int  r_ , int g_ , int b_) {
+    Color(double  r_ , double g_ , double b_) {
         r = r_;
         g = g_;
         b = b_;
@@ -40,6 +40,7 @@ crd operator +(const crd & a , const crd & b);
 
 crd solveMatrix3(const std::vector<crd> & columns , crd b);
 
+crd normalize(const crd & vc);
 crd getNormVec(const crd & v);
 double scal(const crd & a , const crd & b);
 crd mult(const crd & a , const crd & b);
@@ -57,6 +58,8 @@ class Material {
 public:
     Color color;
 };
+
+class Matrial
 
 class Shape {
 public:

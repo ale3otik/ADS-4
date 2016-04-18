@@ -21,10 +21,17 @@ int main() {
     int width = 1500;
     int height = 1500;
     
-    crd corner(1500 , 0 , 750);
-    crd a(0,0,-1);
-    crd b(-1,-1,0);
-    crd obs(70000, -70000, 20000);
+    crd corner(-width/2 , height/2 , -1000);
+    crd nline = normalize(crd( 0.2 , -0.2, 1.0));
+    crd a(1, -0.1 ,-0.2);
+    crd b = normalize(mult(nline, a));
+    cout << b.x << " " << b.y << " " << b.z <<endl;
+    a = normalize(mult(b,nline));
+    cout << a.x << " " << a.y << " " << a.z <<endl;
+    cout << scal(a, b) <<endl;
+//    crd nline = normalize(mult(b, a));
+    double distobs = -3000;
+    crd obs = corner + (width/2.0) * a + (height/2.0) * b + distobs * nline;
     
 //    int width = 200;
 //    int height = 200;

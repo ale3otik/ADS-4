@@ -120,7 +120,7 @@ crd Triangle::getNormal(const crd & point) const {
 }
 
 bool Triangle::is_inside_(const crd & point) const {
-    if(get_dist_(point) > 3.0 * EPS) return false;
+    if(get_dist_(point) > EPS) return false;
     vector<crd> v(3);
     v[0] = vertices_[1] - vertices_[0];
     v[1] = vertices_[2] - vertices_[0];

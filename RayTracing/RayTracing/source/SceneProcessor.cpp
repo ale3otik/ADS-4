@@ -19,7 +19,7 @@ vector<vector<Color> > SceneProcessor::buildScene() {
     vector<vector<Color> > result(height_ , vector<Color> (width_));
     for(int y = 0; y < height_; ++ y) {
         for(int x = 0; x < width_; ++ x) {
-            crd pix_pos = scr_corner_ + (x + 1) * scr_a_ + (y + 1) * scr_b_;
+            crd pix_pos = scr_corner_ + (double)(x + 1) * scr_a_ + (double)(y + 1) * scr_b_;
             Ray r(pix_pos , pix_pos - obsr_pos_);
             result[y][x] = trace_ray_(r);
         }
