@@ -11,6 +11,7 @@
 
 #include <vector>
 
+const double EPS = 1e-9;
 
 struct Color {
     Color(){};
@@ -32,6 +33,17 @@ struct crd {
     double length() const;
     double len2() const;
     double x,y,z;
+};
+
+struct Light {
+    Light(){};
+    Light(const crd & pos_ , double rate_) {
+        pos = pos_;
+        rate = rate_;
+    };
+    
+    crd pos;
+    double rate; // >= 0;
 };
 
 crd operator * (const double & cof , const crd & v);
@@ -59,7 +71,6 @@ public:
     Color color;
 };
 
-class Matrial
 
 class Shape {
 public:

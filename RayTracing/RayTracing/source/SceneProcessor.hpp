@@ -13,12 +13,19 @@
 
 class SceneProcessor {
 public:
-    SceneProcessor(const std::vector<std::shared_ptr<Shape> > & data);
-    SceneProcessor & setScreenPosition(crd corner , crd a , crd b, int width , int height);
+    SceneProcessor(): base_light(0.1) {};
+    
+    SceneProcessor & setScene(const std::vector<std::shared_ptr<Shape> > & shapes ,
+                              const std::vector<std::shared_ptr<Light> > & light);
+    
+    SceneProcessor & setScreenPosition(crd corner, crd a, crd b, int width , int height);
     SceneProcessor & setObserverPosition(crd pos);
+    SceneProcessor & setBaseIntensity(double value);
     std::vector<std::vector<Color> > buildScene();
+    
 private:
     std::vector<std::shared_ptr<Shape> > shapes_;
+    std::vector<std::shared_ptr<Light> > light_;
     
     crd scr_a_;
     crd scr_b_;
@@ -28,7 +35,12 @@ private:
     
     crd obsr_pos_;
     
-    Color trace_ray_(const Ray & ray) const;
+    double base_light;
+    
+    std::pair<int , double> find_ray_intersection_(const Ray & ray) const;
+    Color get_pix_color_(int id , double dist , const Ray & ray) const;
+    double get_intensity_(const crd & pt, const crd & normal) const;
+    Color transform_color_(Color color , double ext_intensity) const;
 };
 
 #endif /* SceneProcessor_hpp */

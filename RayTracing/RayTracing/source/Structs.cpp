@@ -10,8 +10,7 @@
 #include <vector>
 #include <cmath>
 #include <cassert>
-#include <iostream>
-const double EPS = 1e-9;
+
 using std::pair;
 using std::make_pair;
 using std::vector;
@@ -23,19 +22,19 @@ double crd::len2() const {
     return x * x + y*y + z * z;
 }
 
-crd operator -(const crd & a , const crd & b) {
+inline crd operator -(const crd & a , const crd & b) {
     return crd(a.x - b.x , a.y - b.y , a.z - b.z);
 }
 
-crd operator +(const crd & a , const crd & b) {
+inline crd operator +(const crd & a , const crd & b) {
     return crd(a.x + b.x , a.y + b.y , a.z + b.z);
 }
 
-crd operator * (const double & cof , const crd & v) {
+inline  crd operator * (const double & cof , const crd & v) {
     return crd(cof * v.x ,cof * v.y ,cof * v.z);
 }
 
-double get_det3(const vector<crd> & cs) {
+inline  double get_det3(const vector<crd> & cs) {
     assert(cs.size() == 3);
     
     // dangerous O_o !!!
@@ -45,7 +44,7 @@ double get_det3(const vector<crd> & cs) {
 
 }
 
-crd solveMatrix3(const std::vector<crd> & columns , crd b) {
+inline crd solveMatrix3(const std::vector<crd> & columns , crd b) {
     assert(columns.size() == 3);
     vector<crd> new_columns = columns;
     double det = get_det3(new_columns);
@@ -60,22 +59,21 @@ crd solveMatrix3(const std::vector<crd> & columns , crd b) {
     return crd(d[0]/det , d[1] / det , d[2] / det);
 }
 
-crd normalize(const crd & vc) {
+inline crd normalize(const crd & vc) {
     double len = vc.length();
-    assert(len > EPS);
+    if(len < EPS) return crd(0,0,0);
     return (1.0/len) * vc;
 }
 
-double scal(const crd & a , const crd & b) {
+inline double scal(const crd & a , const crd & b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-crd mult(const crd & a , const crd & b) {
+inline crd mult(const crd & a , const crd & b) {
     return crd(a.z * b.y - a.y * b.z,
                a.x * b.z - a.z * b.x,
                a.y * b.x - a.x * b.y);
 }
-
 
 Ray::Ray(const crd & pt_ , const crd & dir_) {
     dir = normalize(dir_);
@@ -127,7 +125,7 @@ bool Triangle::is_inside_(const crd & point) const {
     v[2] = normal_;
     crd b = point - vertices_[0];
     crd coords = solveMatrix3(v, b);
-    assert(fabs(coords.z) < EPS);
+    assert(fabs(coords.z) < 10.0 * EPS);
     return coords.x >= -EPS && coords.y >= -EPS && coords.x + coords.y <= (1.0 + EPS);
 }
 

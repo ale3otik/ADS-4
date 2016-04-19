@@ -41,6 +41,9 @@ std::vector<std::shared_ptr<Shape> > PPMTransformer::getShapesFromFile(const std
     for(int i = 0 ; i < qnt; ++i) {
         Color clr;
         file >> clr.r >> clr.g >> clr.b;
+        clr.r = std::max(2,clr.r);
+        clr.g = std::max(2,clr.g);
+        clr.b = std::max(2,clr.b);
         crd vertices[3];
         for(int j = 0; j < 3; ++j) {
             file >> vertices[j].x >> vertices[j].y >> vertices[j].z;
