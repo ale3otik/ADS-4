@@ -14,6 +14,7 @@
 #include <chrono>
 #include <array>
 #include "futex.hpp"
+#include "mutex_manual_barriers.hpp"
 #include "sync_queue.hpp"
 
 using std::vector;
@@ -21,6 +22,11 @@ using std::thread;
 using std::cout;
 using std::endl;
 
+#define MUTEX_TEST
+//#define QUEUE_TEST
+
+
+#ifdef MUTEX_TEST
 template <class M>
 void inc(M * mutex, int * value , int * limit , int * thrcount) {
     while(*value < *limit) {
@@ -54,13 +60,15 @@ void check(int limit , int64_t nthreads) {
     assert(value == sum && value == limit);
 }
 
-void testA() {
+void testFutex() {
     const int64_t limit = (int)1e5;
     const int ntests = 10;
     
     vector<int64_t> nthreads(ntests);
     vector<int64_t> ftime(ntests);
     vector<int64_t> mtime(ntests);
+    vector<int64_t> strongtime(ntests);
+    vector<int64_t> weaktime(ntests);
     
     for(int i = 0; i < ntests; ++i) {
         nthreads[i] = i + 1;
@@ -77,6 +85,16 @@ void testA() {
         check<std::mutex>(limit, nthreads[test]);
         end = std::chrono::system_clock::now();
         mtime[test] = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+        
+        start = std::chrono::system_clock::now();
+        check<mutex_barrier_weak>(limit, nthreads[test]);
+        end = std::chrono::system_clock::now();
+        weaktime[test] = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+        
+        start = std::chrono::system_clock::now();
+        check<mutex_barrier_strong>(limit, nthreads[test]);
+        end = std::chrono::system_clock::now();
+        strongtime[test] = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
     }
     
     cout << "hardware_concurrency : " << std::thread::hardware_concurrency() << "\n";
@@ -84,13 +102,18 @@ void testA() {
     
     for(int i = 0; i < ntests; ++i){
         cout << "nthreads :"  << nthreads[i] << "\n";
-        cout << ("   futex" ) <<" time : " << ftime[i] << "ms" << endl;
-        cout << ("   mutex" ) <<" time : " << mtime[i] << "ms" << endl;
-        cout <<  "   f/m ratio <" << ftime[i] / (float)mtime[i] << ">" << endl;
+        cout << ("    my futex" ) <<" time : " << ftime[i] << "ms" << endl;
+        cout << ("  std::mutex" ) <<" time : " << mtime[i] << "ms" << endl;
+        cout << ("mutex strong" ) <<" time : " << strongtime[i] << "ms" << endl;
+        cout << ("  mutex weak" ) <<" time : " << weaktime[i] << "ms" << endl;
+//        cout <<  "   f/m ratio <" << ftime[i] / (float)mtime[i] << ">" << endl;
         
     }
 }
 
+#endif
+
+#ifdef QUEUE_TEST
 template <class T>
 void test_queue_thread(SyncQueue<T> * q, int * qnt , int limit) {
     for(int i = 0; i < limit; ++i) {
@@ -127,10 +150,16 @@ void test_queue() {
     assert(sum == ((qsize * (qsize+1)) / 2));
     cout << "queue works" << endl;
 }
+#endif
 
 int main() {
-//    testA();
+#ifdef MUTEX_TEST
+    testFutex();
+#endif
+
+#ifdef QUEUE_TEST
     test_queue();
+#endif
 
     
     return 0;

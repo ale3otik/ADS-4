@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FA938F4A1CC944A700E59A67 /* mutex_manual_barriers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA938F481CC944A700E59A67 /* mutex_manual_barriers.cpp */; };
 		FABA446A1C98BBC10054BD63 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FABA44691C98BBC10054BD63 /* main.cpp */; };
+		FABA44721C98BC8B0054BD63 /* futex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FABA44701C98BC8B0054BD63 /* futex.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -23,8 +25,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		FA49A63A1C9B1B2700480549 /* sync_queue.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = sync_queue.hpp; sourceTree = "<group>"; };
+		FA938F481CC944A700E59A67 /* mutex_manual_barriers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mutex_manual_barriers.cpp; sourceTree = "<group>"; };
+		FA938F491CC944A700E59A67 /* mutex_manual_barriers.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mutex_manual_barriers.hpp; sourceTree = "<group>"; };
 		FABA44661C98BBC10054BD63 /* Futex */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Futex; sourceTree = BUILT_PRODUCTS_DIR; };
 		FABA44691C98BBC10054BD63 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		FABA44701C98BC8B0054BD63 /* futex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = futex.cpp; sourceTree = "<group>"; };
+		FABA44711C98BC8B0054BD63 /* futex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = futex.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +65,11 @@
 			isa = PBXGroup;
 			children = (
 				FABA44691C98BBC10054BD63 /* main.cpp */,
+				FABA44701C98BC8B0054BD63 /* futex.cpp */,
+				FA938F481CC944A700E59A67 /* mutex_manual_barriers.cpp */,
+				FA938F491CC944A700E59A67 /* mutex_manual_barriers.hpp */,
+				FABA44711C98BC8B0054BD63 /* futex.hpp */,
+				FA49A63A1C9B1B2700480549 /* sync_queue.hpp */,
 			);
 			path = Futex;
 			sourceTree = "<group>";
@@ -118,6 +130,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA938F4A1CC944A700E59A67 /* mutex_manual_barriers.cpp in Sources */,
+				FABA44721C98BC8B0054BD63 /* futex.cpp in Sources */,
 				FABA446A1C98BBC10054BD63 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -205,6 +219,7 @@
 		FABA446E1C98BBC10054BD63 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -212,6 +227,7 @@
 		FABA446F1C98BBC10054BD63 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -235,6 +251,7 @@
 				FABA446F1C98BBC10054BD63 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
