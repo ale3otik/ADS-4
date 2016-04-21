@@ -1,10 +1,10 @@
-## task 4.2
+# task 4.2
 
-#ping pong effect
+##ping pong effect
   + YES : 8.746 (c)
   + NO : 2.269 (c)
 
-#CPU
+##CPU
 + Intel(R) Core(TM) i5-4278U CPU @ 2.60GHz
 + cachelinesize: 64
 + l1 i cachesize: 32768
