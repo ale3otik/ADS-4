@@ -6,6 +6,6 @@
 
 ##CPU
 + Intel(R) Core(TM) i5-4278U CPU @ 2.60GHz
-+ cachelinesize: 64
-+ l1 i cachesize: 32768
-+ l1 d cachesize: 32768
++ cachelinesize: 64 B
++ l1 i cachesize: 32768 B
++ l1 d cachesize: 32768 B
