@@ -27,22 +27,45 @@ using std::endl;
 
 
 #ifdef MUTEX_TEST
+#define MOD ((int)1e9 + 7)
+#define QNT ((int)1e4)
+
+inline void change(int * value) {
+    *value = (*value * 17 + 967890) % MOD;
+    *value = (*value * 51 + 878987) % MOD;
+    *value = (*value * 23 + 789098) % MOD;
+    *value = (*value * 93 + 10998) % MOD;
+    *value = (*value * 12 + 167890) % MOD;
+    *value = (*value * 49 + 12123) % MOD;
+    *value = (*value * 47 + 123322) % MOD;
+    *value = (*value * 12 + 12312444) % MOD;
+    *value = (*value * 49 + 12349893) % MOD;
+    *value = (*value * 19 + 12323114) % MOD;
+}
+
 template <class M>
 void inc(M * mutex, int * value , int * limit , int * thrcount) {
-    while(*value < *limit) {
+    for(int i = 0;i < QNT; ++i) {
         mutex->lock();
-        if(*value < *limit) {
-            ++*value;
-            ++*thrcount;
-        }
+        change(value);
         mutex->unlock();
     }
+    
 }
+//    while(*value < *limit) {
+//        mutex->lock();
+//        if(*value < *limit) {
+//            ++*value;
+//            ++*thrcount;
+//        }
+//        mutex->unlock();
+//    }
+//}
 
 template <class M>
 void check(int limit , int64_t nthreads) {
     M mutex;
-    int value = 0;
+    int value = 1;
     vector<int> thrcount(nthreads , 0);
     vector<thread> threads;
     for(int i = 0 ;  i < nthreads ;++ i) {
@@ -57,7 +80,11 @@ void check(int limit , int64_t nthreads) {
         sum += thrcount[i];
     }
     
-    assert(value == sum && value == limit);
+    int exp = 1;
+    
+    for(int i = 0; i < nthreads * QNT; ++i) change(&exp);
+    assert(value == exp);
+//    assert(value == sum && value == limit);
 }
 
 void testFutex() {
@@ -97,17 +124,16 @@ void testFutex() {
         strongtime[test] = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
     }
     
-    cout << "hardware_concurrency : " << std::thread::hardware_concurrency() << "\n";
+    cout << "hardware_concurrency : " << std::thread::hardware_concurrency() << "\n\n";
     cout << "limit : " << limit << "\n\n";
     
     for(int i = 0; i < ntests; ++i){
-        cout << "nthreads :"  << nthreads[i] << "\n";
-        cout << ("    my futex" ) <<" time : " << ftime[i] << "ms" << endl;
-        cout << ("  std::mutex" ) <<" time : " << mtime[i] << "ms" << endl;
-        cout << ("mutex strong" ) <<" time : " << strongtime[i] << "ms" << endl;
-        cout << ("  mutex weak" ) <<" time : " << weaktime[i] << "ms" << endl;
+        cout << "+ nthreads :"  << nthreads[i] << "\n\n";
+        cout << ("        my futex" ) <<" time : " << ftime[i] << "ms\n" << endl;
+        cout << ("      std::mutex" ) <<" time : " << mtime[i] << "ms\n" << endl;
+        cout << ("    mutex strong" ) <<" time : " << strongtime[i] << "ms\n" << endl;
+        cout << ("      mutex weak" ) <<" time : " << weaktime[i] << "ms\n" << endl;
 //        cout <<  "   f/m ratio <" << ftime[i] / (float)mtime[i] << ">" << endl;
-        
     }
 }
 

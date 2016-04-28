@@ -47,10 +47,8 @@ void mutex_barrier_weak::unlock() {
 }
 
 inline int64_t mutex_barrier_weak::get_thread_id_() const {
-    std::stringstream sstream;
-    std::string str;
-    sstream << std::this_thread::get_id();
-    return (int64_t)std::stoll(sstream.str(), nullptr, 16);
+    std::thread::id thread_id = std::this_thread::get_id();
+    return *((int *)(&thread_id));
 }
 
 /*
@@ -89,8 +87,6 @@ void mutex_barrier_strong::unlock() {
 }
 
 inline int64_t mutex_barrier_strong::get_thread_id_() const {
-    std::stringstream sstream;
-    std::string str;
-    sstream << std::this_thread::get_id();
-    return (int64_t)std::stoll(sstream.str(), nullptr, 16);
+    std::thread::id thread_id = std::this_thread::get_id();
+    return *((int *)(&thread_id));
 }

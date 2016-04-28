@@ -45,9 +45,6 @@ void futex::unlock() {
 }
 
 inline int64_t futex::get_thread_id_() const {
-    std::stringstream sstream;
-    std::string str;
-//    int x = static_cast<int>(std::this_thread::get_id());
-    sstream << std::this_thread::get_id();
-    return (int64_t)std::stoll(sstream.str(), nullptr, 16);
+    std::thread::id thread_id = std::this_thread::get_id();
+    return *((int *)(&thread_id));
 }
