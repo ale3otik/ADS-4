@@ -12,6 +12,7 @@
 #include "PPMTransformer.hpp"
 #include "SceneProcessor.hpp"
 #include "Structs.h"
+#include <chrono>
 
 using namespace std;
 int main() {
@@ -19,14 +20,14 @@ int main() {
     vector<std::shared_ptr<Shape> > triangles = PPMTransformer::getShapesFromFile("elements.txt");
     vector<std::shared_ptr<Light> > light = PPMTransformer::getLightFromFile("light.txt");
     
-    int width = 1500;
+    int width = 2000;
     int height = 1500;
     
     crd corner(-width/2 , height/2 , -1000);
     crd nline = normalize(crd(0.2 , -0.2, 1.0));
     crd a(1, -0.1 ,-0.2);
     crd b = normalize(mult(nline, a));
-    cout << b.x << " " << b.y << " " << b.z <<endl;
+    cout << b.x << " " << b.y << " " <<b.z <<endl;
     a = normalize(mult(b,nline));
     cout << a.x << " " << a.y << " " << a.z <<endl;
     cout << scal(a, b) <<endl;
@@ -48,6 +49,8 @@ int main() {
 //    light.push_back(std::shared_ptr<Light> (new Light(crd(-300,250, -600) , 2*1e5)));
 //    light.push_back(std::shared_ptr<Light> (new Light(crd(+300,-50, -400) , 2*1e5)));
     
+    std::chrono::time_point<std::chrono::system_clock> start, end;
+    start = std::chrono::system_clock::now();
     vector<vector<Color> > result = SceneProcessor()
                                     .setScene(triangles, light)
                                     .setScreenPosition(corner, a, b , width , height)
@@ -55,6 +58,10 @@ int main() {
                                     .buildScene();
 
     PPMTransformer::transformToPPM(result, "out.ppm");
+    
+    end = std::chrono::system_clock::now();
+    double x = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count() / 1000.0;
+    cout << x <<endl;
     
 //    Ray r(crd(0,1,0) , crd(0,0,1));
 //    pair<bool,crd> res = triangles[0].getIntersection(r);
