@@ -35,25 +35,61 @@ std::vector<std::shared_ptr<Shape> > PPMTransformer::getShapesFromFile(const std
     
     int qnt;
     file >> qnt;
-    assert(qnt > 0);
+    assert(qnt >= 0);
     std::vector<std::shared_ptr<Shape> > result(qnt);
 
     for(int i = 0 ; i < qnt; ++i) {
+        int id;
+        file >> id;
         Color clr;
         file >> clr.r >> clr.g >> clr.b;
         clr.r = std::max(2,clr.r);
         clr.g = std::max(2,clr.g);
         clr.b = std::max(2,clr.b);
-        crd vertices[3];
-        for(int j = 0; j < 3; ++j) {
-            file >> vertices[j].x >> vertices[j].y >> vertices[j].z;
+        if(id == 1) {  // triangle
+            crd vertices[3];
+            for(int j = 0; j < 3; ++j) {
+                file >> vertices[j].x >> vertices[j].y >> vertices[j].z;
+            }
+            
+            std::shared_ptr<Triangle> t(new Triangle(vertices));
+            t->setColor(clr);
+            result[i] = t;
+        } else if(id == 2) {
+            crd center;
+            double radius;
+            file >> center.x >> center.y >> center.z;
+            file >> radius;
+            std::shared_ptr<Sphere> s(new Sphere(center,radius));
+            s->setColor(clr);
+            result[i] = s;
+        } else {
+            return result;
         }
-        
-        std::shared_ptr<Triangle> t(new Triangle(vertices));
-        t->setColor(clr);
-        
-        result[i] = t;
     }
     
+    file.close();
+    return result;
+}
+
+std::vector<std::shared_ptr<Light> > PPMTransformer::getLightFromFile(const std::string & fname) {
+    std::ifstream file(fname);
+    assert(file.is_open());
+    
+    int qnt;
+    file >> qnt;
+    assert(qnt >= 0);
+    std::vector<std::shared_ptr<Light> > result(qnt);
+    
+    for(int i = 0 ; i < qnt; ++i) {
+        crd pos;
+        int intense;
+        file >> pos.x >> pos.y >> pos.z;
+        file >> intense;
+        std::shared_ptr<Light> l(new  Light(pos,intense));
+        result[i] = l;
+    }
+    
+    file.close();
     return result;
 }

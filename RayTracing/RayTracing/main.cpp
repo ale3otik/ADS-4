@@ -17,7 +17,8 @@ using namespace std;
 int main() {
     
     vector<std::shared_ptr<Shape> > triangles = PPMTransformer::getShapesFromFile("elements.txt");
-
+    vector<std::shared_ptr<Light> > light = PPMTransformer::getLightFromFile("light.txt");
+    
     int width = 1500;
     int height = 1500;
     
@@ -42,10 +43,10 @@ int main() {
 //    
 //    crd obs(0,0,-1000);
 
-    vector<std::shared_ptr<Light> > light;
+//    vector<std::shared_ptr<Light> > light;
 //    light.push_back(std::shared_ptr<Light> (new Light(crd(250,-550, -30) , 100000.0)));
-    light.push_back(std::shared_ptr<Light> (new Light(crd(-300,250, -600) , 2*1e5)));
-    light.push_back(std::shared_ptr<Light> (new Light(crd(+300,-50, -400) , 2*1e5)));
+//    light.push_back(std::shared_ptr<Light> (new Light(crd(-300,250, -600) , 2*1e5)));
+//    light.push_back(std::shared_ptr<Light> (new Light(crd(+300,-50, -400) , 2*1e5)));
     
     vector<vector<Color> > result = SceneProcessor()
                                     .setScene(triangles, light)

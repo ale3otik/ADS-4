@@ -63,20 +63,17 @@ double SceneProcessor::get_intensity_(const crd & pt, const crd & normal) const 
     for(int i = 0; i < light_.size(); ++i) {
         crd vec = light_[i]->pos - pt;
         crd nvec = normalize(vec);
-        if(vec.len2() < 100 * 100) {
-            
-        }
+
         if(scal(nvec, normal) < 0.0) continue;
         
         // |>|>--D-- KOSTYL!!???//
-        Ray r(pt + (2.0 * EPS) * nvec + (2 * EPS) * normal, nvec);
+        /** TO NOT INTERSECT CURRENT SHAPE **/
+        Ray r(pt + (1.0 * EPS) * nvec + (1.5 * EPS) * normal, nvec);
         
         pair <int , double> intrs = find_ray_intersection_(r);
         if(intrs.first >= 0 && intrs.second <= nvec.length()) continue;
         
-        if(vec.len2() < 100 * 100) {
-            
-        }
+
         
         intensity += light_[i]->rate * fabs(scal(nvec , normal)) / vec.len2();
     }

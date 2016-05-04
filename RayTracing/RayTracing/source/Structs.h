@@ -102,15 +102,19 @@ private:
     /* .. another params ..*/
 };
 
-//class Sphere : Shape {
-//public:
-//    crd getIntrsectPoint(const Ray & ray) const;
-//    crd getNormal(const crd & point) const;
-//    Color getColor() const;
-//private:
-//    crd center;
-//    double radius;
-//    Material material;
-//};
+class Sphere : public Shape {
+public:
+    Sphere(){};
+    Sphere(crd center, double radius);
+    
+    std::pair<bool , double> getIntersection(const Ray & ray) const;
+    crd getNormal(const crd & point) const;
+    Color getColor() const;
+    void setColor(const Color & color);
+private:
+    crd center_;
+    double radius_;
+    Material material_;
+};
 
 #endif /* Structs_h */

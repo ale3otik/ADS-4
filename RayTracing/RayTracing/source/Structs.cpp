@@ -10,7 +10,6 @@
 #include <vector>
 #include <cmath>
 #include <cassert>
-
 using std::pair;
 using std::make_pair;
 using std::vector;
@@ -32,6 +31,14 @@ inline crd operator +(const crd & a , const crd & b) {
 
 inline  crd operator * (const double & cof , const crd & v) {
     return crd(cof * v.x ,cof * v.y ,cof * v.z);
+}
+
+inline double get_pt_dist(const crd & a, const crd & b) {
+    return (b-a).length();
+}
+
+inline double get_pt_dist2(const crd & a, const crd & b) {
+    return (b-a).len2();
 }
 
 inline  double get_det3(const vector<crd> & cs) {
@@ -87,7 +94,7 @@ Triangle::Triangle(crd nvertices_[3]) {
     normal_ = normalize(mult(vertices_[1] - vertices_[0], vertices_[2] - vertices_[0]));
     
     crd & v = vertices_[0];
-    D_ = - (normal_.x *  v.x + normal_.y * v.y + normal_.z * v.z);
+    D_ = - scal(normal_,v);
     assert(normal_.length() > EPS);
 }
 
@@ -125,7 +132,7 @@ bool Triangle::is_inside_(const crd & point) const {
     v[2] = normal_;
     crd b = point - vertices_[0];
     crd coords = solveMatrix3(v, b);
-    assert(fabs(coords.z) < 10.0 * EPS);
+//    assert(fabs(coords.z) <  2 * EPS);
     return coords.x >= -EPS && coords.y >= -EPS && coords.x + coords.y <= (1.0 + EPS);
 }
 
@@ -134,7 +141,46 @@ double Triangle::get_dist_(const crd & pt) const {
 }
 /***************Sphere****************/
 
-//Color Sphere::getColor() const {
-//    
-//    return material.color;
-//}
+Sphere::Sphere(crd center, double radius) {
+    center_ = center;
+    radius_ = radius;
+}
+
+std::pair<bool , double> Sphere::getIntersection(const Ray & ray) const {
+    crd normal = -1 * ray.dir;
+    double D = - scal(normal,center_);
+    double dist = fabs(scal(normal,ray.pt) + D);
+    crd pt_intrs = ray.pt + dist * ray.dir;
+    double center_to_pt2 = get_pt_dist2(center_ , pt_intrs);
+    
+    if(center_to_pt2 > radius_ * radius_) {
+        return make_pair(false , 0);
+    }
+    
+    double ret_dist = sqrt(radius_ * radius_ - center_to_pt2);
+    
+    crd pt_1 = pt_intrs - ret_dist * normal;
+    if(scal((pt_1 - ray.pt) , ray.dir) >= 0) {
+        return make_pair(true , dist - ret_dist);
+    }
+    
+    crd pt_2 = pt_intrs + ret_dist * normal;
+    if(scal((pt_2 - ray.pt) , ray.dir) >= 0) {
+        return make_pair(true , dist + ret_dist);
+    }
+    
+    return make_pair(false , 0);
+    
+}
+
+crd Sphere::getNormal(const crd & point) const {
+    return normalize(point - center_);
+}
+
+Color Sphere::getColor() const {
+    return material_.color;
+}
+
+void Sphere::setColor(const Color & color) {
+    material_.color = color;
+}
