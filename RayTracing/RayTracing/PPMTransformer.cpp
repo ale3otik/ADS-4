@@ -43,9 +43,9 @@ std::vector<std::shared_ptr<Shape> > PPMTransformer::getShapesFromFile(const std
         file >> id;
         Color clr;
         file >> clr.r >> clr.g >> clr.b;
-        clr.r = std::max(2,clr.r);
-        clr.g = std::max(2,clr.g);
-        clr.b = std::max(2,clr.b);
+        clr.r = std::max(5,clr.r);
+        clr.g = std::max(5,clr.g);
+        clr.b = std::max(5,clr.b);
         if(id == 1) {  // triangle
             crd vertices[3];
             for(int j = 0; j < 3; ++j) {

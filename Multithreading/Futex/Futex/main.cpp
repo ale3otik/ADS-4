@@ -28,7 +28,7 @@ using std::endl;
 
 #ifdef MUTEX_TEST
 #define MOD ((int)1e9 + 7)
-#define QNT ((int)1e4)
+#define QNT ((int)1e7)
 
 inline void change(int * value) {
     *value = (*value * 17 + 967890) % MOD;
@@ -41,6 +41,13 @@ inline void change(int * value) {
     *value = (*value * 12 + 12312444) % MOD;
     *value = (*value * 49 + 12349893) % MOD;
     *value = (*value * 19 + 12323114) % MOD;
+    *value = (*value * 17 + 967890) % MOD;
+    *value = (*value * 51 + 878987) % MOD;
+    *value = (*value * 23 + 789098) % MOD;
+    *value = (*value * 93 + 10998) % MOD;
+    *value = (*value * 12 + 167890) % MOD;
+    *value = (*value * 49 + 12123) % MOD;
+    *value = (*value * 47 + 123322) % MOD;
 }
 
 template <class M>
@@ -88,31 +95,34 @@ void check(int limit , int64_t nthreads) {
 }
 
 void testFutex() {
-    const int64_t limit = (int)1e5;
-    const int ntests = 10;
+    const int64_t limit = (int)1e10;
+
+    const int numthreads = 1;
+    vector<int64_t> nthreads(numthreads);
+    vector<int64_t> ftime(numthreads);
+    vector<int64_t> mtime(numthreads);
+    vector<int64_t> strongtime(numthreads);
+    vector<int64_t> weaktime(numthreads);
     
-    vector<int64_t> nthreads(ntests);
-    vector<int64_t> ftime(ntests);
-    vector<int64_t> mtime(ntests);
-    vector<int64_t> strongtime(ntests);
-    vector<int64_t> weaktime(ntests);
     
-    for(int i = 0; i < ntests; ++i) {
-        nthreads[i] = i + 1;
-    }
+//    for(int i = 0; i < ntests; ++i) {
+//        nthreads[i] = i + 1;
+//    }
     
     std::chrono::time_point<std::chrono::system_clock> start, end;
-    for(int test = 0; test < ntests; ++test){
-        start = std::chrono::system_clock::now();
-        check<futex>(limit, nthreads[test]);
-        end = std::chrono::system_clock::now();
-        ftime[test] = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
-        
-        start = std::chrono::system_clock::now();
-        check<std::mutex>(limit, nthreads[test]);
-        end = std::chrono::system_clock::now();
-        mtime[test] = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
-        
+    nthreads[0] = 4;
+//    for(int test = 0; test < ntests; ++test){
+//        start = std::chrono::system_clock::now();
+//        check<futex>(limit, nthreads[test]);
+//        end = std::chrono::system_clock::now();
+//        ftime[test] = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+//        
+//        start = std::chrono::system_clock::now();
+//        check<std::mutex>(limit, nthreads[test]);
+//        end = std::chrono::system_clock::now();
+//        mtime[test] = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+//
+    int test = 0;
         start = std::chrono::system_clock::now();
         check<mutex_barrier_weak>(limit, nthreads[test]);
         end = std::chrono::system_clock::now();
@@ -122,15 +132,15 @@ void testFutex() {
         check<mutex_barrier_strong>(limit, nthreads[test]);
         end = std::chrono::system_clock::now();
         strongtime[test] = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
-    }
+//    }
     
     cout << "hardware_concurrency : " << std::thread::hardware_concurrency() << "\n\n";
     cout << "limit : " << limit << "\n\n";
     
-    for(int i = 0; i < ntests; ++i){
+    for(int i = 0; i < numthreads; ++i){
         cout << "+ nthreads :"  << nthreads[i] << "\n\n";
-        cout << ("        my futex" ) <<" time : " << ftime[i] << "ms\n" << endl;
-        cout << ("      std::mutex" ) <<" time : " << mtime[i] << "ms\n" << endl;
+//        cout << ("        my futex" ) <<" time : " << ftime[i] << "ms\n" << endl;
+//        cout << ("      std::mutex" ) <<" time : " << mtime[i] << "ms\n" << endl;
         cout << ("    mutex strong" ) <<" time : " << strongtime[i] << "ms\n" << endl;
         cout << ("      mutex weak" ) <<" time : " << weaktime[i] << "ms\n" << endl;
 //        cout <<  "   f/m ratio <" << ftime[i] / (float)mtime[i] << ">" << endl;

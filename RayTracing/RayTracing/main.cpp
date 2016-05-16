@@ -13,11 +13,12 @@
 #include "SceneProcessor.hpp"
 #include "Structs.h"
 #include <chrono>
+#include "KDtree.hpp"
 
 using namespace std;
 int main() {
     
-    vector<std::shared_ptr<Shape> > triangles = PPMTransformer::getShapesFromFile("elements.txt");
+    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::getShapesFromFile("elements.txt");
     vector<std::shared_ptr<Light> > light = PPMTransformer::getLightFromFile("light.txt");
     
     int width = 2000;
@@ -31,44 +32,28 @@ int main() {
     a = normalize(mult(b,nline));
     cout << a.x << " " << a.y << " " << a.z <<endl;
     cout << scal(a, b) <<endl;
-//    crd nline = normalize(mult(b, a));
     double distobs = -3000;
     crd obs = corner + (width/2.0) * a + (height/2.0) * b + distobs * nline;
     
-//    int width = 200;
-//    int height = 200;
-//    
-//    crd corner(-width/2,-height/2,0);
-//    crd a(1,0,0);
-//    crd b(0,1,0);
-//    
-//    crd obs(0,0,-1000);
-
-//    vector<std::shared_ptr<Light> > light;
-//    light.push_back(std::shared_ptr<Light> (new Light(crd(250,-550, -30) , 100000.0)));
-//    light.push_back(std::shared_ptr<Light> (new Light(crd(-300,250, -600) , 2*1e5)));
-//    light.push_back(std::shared_ptr<Light> (new Light(crd(+300,-50, -400) , 2*1e5)));
     
     std::chrono::time_point<std::chrono::system_clock> start, end;
     start = std::chrono::system_clock::now();
-    vector<vector<Color> > result = SceneProcessor()
-                                    .setScene(triangles, light)
-                                    .setScreenPosition(corner, a, b , width , height)
-                                    .setObserverPosition(obs)
-                                    .buildScene();
-
-    PPMTransformer::transformToPPM(result, "out.ppm");
+    
+    KDtree tree = KDtree().buildTree(shapes);
+    
+    
+//    vector<vector<Color> > result = SceneProcessor()
+//                                    .setScene(shapes, light)
+//                                    .setScreenPosition(corner, a, b , width , height)
+//                                    .setObserverPosition(obs)
+//                                    .buildScene();
+//
+//    PPMTransformer::transformToPPM(result, "out.ppm");
     
     end = std::chrono::system_clock::now();
     double x = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count() / 1000.0;
     cout << x <<endl;
     
-//    Ray r(crd(0,1,0) , crd(0,0,1));
-//    pair<bool,crd> res = triangles[0].getIntersection(r);
-//    bool bl = res.first;
-//    crd itr = res.second;
-//    cout << bl <<endl;
-//    cout << itr.x << " " <<itr.y <<" "<< itr.z << endl;
     cout << "OK" <<endl;
     return 0;
 }

@@ -73,8 +73,6 @@ double SceneProcessor::get_intensity_(const crd & pt, const crd & normal) const 
         pair <int , double> intrs = find_ray_intersection_(r);
         if(intrs.first >= 0 && intrs.second <= vec.length()) continue;
         
-
-        
         intensity += light_[i]->rate * fabs(scal(nvec , normal)) / (double) vec.len2();
     }
     return intensity;

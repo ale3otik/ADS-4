@@ -34,6 +34,21 @@ inline  crd operator * (const double & cof , const crd & v) {
     return crd(cof * v.x ,cof * v.y ,cof * v.z);
 }
 
+double crd::getDimCrd(dim dim) const {
+    switch (dim) {
+        case Dim::x:
+            return x;
+            break;
+        case Dim::y:
+            return y;
+            break;
+        case Dim::z:
+            return z;
+        default:
+            assert(0);
+    }
+}
+
 inline double get_pt_dist(const crd & a, const crd & b) {
     return (b-a).length();
 }
@@ -140,11 +155,28 @@ bool Triangle::is_inside_(const crd & point) const {
 double Triangle::get_dist_(const crd & pt) const {
     return fabs(normal_.x * pt.x + normal_.y * pt.y + normal_.z * pt.z + D_);
 }
+
+pair<double, double> Triangle::getBoundRange(dim dim) const {
+    double dims[3];
+    for(int i = 0; i < 3; ++i) {
+        dims[i] = vertices_[i].getDimCrd(dim);
+    }
+    double max = std::max(dims[0],std::max(dims[1],dims[2]));
+    double min = std::min(dims[0],std::min(dims[1],dims[2]));
+    return make_pair(min - EPS,max + EPS);
+}
+
 /***************Sphere****************/
 
 Sphere::Sphere(crd center, double radius) {
     center_ = center;
     radius_ = radius;
+}
+
+pair<double, double> Sphere::getBoundRange(dim dim) const {
+    double min = center_.getDimCrd(dim) - radius_ - EPS;
+    double max = center_.getDimCrd(dim) + radius_ + EPS;
+    return make_pair(min,max);
 }
 
 std::pair<bool , double> Sphere::getIntersection(const Ray & ray) const {
@@ -171,7 +203,6 @@ std::pair<bool , double> Sphere::getIntersection(const Ray & ray) const {
     }
     
     return make_pair(false , 0);
-    
 }
 
 crd Sphere::getNormal(const crd & point) const {
@@ -189,3 +220,55 @@ Color Sphere::getColor() const {
 void Sphere::setColor(const Color & color) {
     material_.color = color;
 }
+
+/************Rectangle****************/
+Rectangle::Rectangle(crd nvertices_[4]) {
+    memcpy(vertices_, nvertices_, 4 * sizeof(crd));
+    normal_ = normalize(mult(vertices_[1] - vertices_[0], vertices_[2] - vertices_[0]));
+    
+    crd & v = vertices_[0];
+    D_ = - scal(normal_,v);
+    assert(normal_.length() > EPS);
+}
+
+Color Rectangle::getColor() const {
+    return material_.color;
+}
+
+void Rectangle::setColor(const Color & color) {
+    material_.color = color;
+}
+
+
+std::pair<bool , double> Rectangle::getIntersection(const Ray & ray) const {
+    double dist = get_dist_(ray.pt);
+    double cos = fabs(scal(ray.dir, normal_));
+    if(cos < EPS) return make_pair(false , 0);
+    
+    dist /= cos;
+    crd expected_pt = ray.pt + dist * ray.dir;
+    if(is_inside_(expected_pt)) {
+        return make_pair(true, dist);
+    }
+    return make_pair(false , 0);
+}
+
+// rect with axises - collinear lines only
+//bool Rectangle::is_inside_(const crd & point) const {
+//    for(short dim = 0; dim < 3; ++dim){
+//        vertices_[i]
+//        if(point.getDimCrd(dim))
+//    }
+//}
+
+crd Rectangle::getNormal(const crd & point) const {
+    return normal_;
+}
+
+/*****************/
+
+bool bound_box_intersection(std::pair<double , double> bounds , const Ray & ray) {
+    
+    return false;
+}
+
