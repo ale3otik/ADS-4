@@ -19,16 +19,24 @@ using namespace std;
 int main() {
     
 //    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::getShapesFromFile("elements.txt");
-    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::scanDataFromASCISTL("chri.stl");
-    Object::rescale(shapes, 0.5);
-    Object::setPosition(shapes, crd(0,0,-200));
+    vector<std::shared_ptr<Shape> > shapesGirya = PPMTransformer::scanDataFromASCISTL("stl/girya.stl");
+    vector<std::shared_ptr<Shape> > shapesChrist = PPMTransformer::scanDataFromASCISTL("stl/chri.stl");
     
-    vector<std::shared_ptr<Light> > light = PPMTransformer::getLightFromFile("light.txt");
+    Object::rescale(shapesGirya, 25);
+    Object::setPosition(shapesGirya, crd(0,0,-200));
+    Object::rescale(shapesChrist, 1e-1);
+    Object::setPosition(shapesChrist, crd(-40,0,100));
     
-    int width = 1000;
-    int height = 2000;
+    vector<std::shared_ptr<Shape> > shapes(shapesGirya.size() + shapesChrist.size());
     
-    crd corner(-width/2 , height/2 , -1000);
+    std::merge(shapesChrist.begin(),shapesChrist.end(),shapesGirya.begin(),shapesGirya.end(),shapes.begin());
+    
+    vector<std::shared_ptr<Light> > light = PPMTransformer::getLightFromFile("stl/light.txt");
+    
+    int width = 1200;
+    int height = 1200;
+    
+    crd corner(-width/2 + 300 , height/2 , 800);
     crd nline = normalize(crd(0.2 , -0.2, 1.0));
     crd a(1, -0.1 ,-0.2);
     crd b = normalize(mult(nline, a));
@@ -36,7 +44,7 @@ int main() {
     a = normalize(mult(b,nline));
     cout << a.x << " " << a.y << " " << a.z <<endl;
     cout << scal(a, b) <<endl;
-    long double distobs = -3000;
+    long double distobs = 3000;
     crd obs = corner + (width/2.0) * a + (height/2.0) * b + distobs * nline;
     
     

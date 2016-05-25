@@ -14,7 +14,7 @@
 
 class SceneProcessor {
 public:
-    SceneProcessor(): base_light(0.1) {};
+    SceneProcessor(): base_light(0.2) {};
     
     SceneProcessor & setScene(const std::vector<std::shared_ptr<Shape> > & shapes ,
                               const std::vector<std::shared_ptr<Light> > & light);

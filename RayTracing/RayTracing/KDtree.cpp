@@ -134,7 +134,7 @@ inline bool KDtree::is_time_to_stop_(int node_idx, int empty_partition_cnt) cons
     const Node & node = nodes_[node_idx];
     if(size(node.shapes_) < 3) return true;
     
-    static const short height_limit = 10;
+    static const short height_limit = 15;
     if(node.height > height_limit) return true;
     
     return false;
