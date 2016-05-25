@@ -13,12 +13,25 @@
 class KDtree {
 public:
     KDtree & buildTree(const std::vector<std::shared_ptr<Shape> > & shapes);
-    std::pair<std::shared_ptr<Shape> , double> findIntrsection(const Ray & ray) const;
+    std::pair<long double, std::shared_ptr<Shape> > findIntrsection(const Ray & ray) const;
 private:
+    
+    class BoundBox {
+    public:
+        BoundBox(){};
+        std::pair<long double , long double> lims[3];
+        
+        std::pair<long double,long double> get_intersection(const Ray & ray) const;
+    private:
+        std::vector<crd> get_rect_(short id) const;
+    };
+    
+    
     class Node {
     public:
         dim div_dim;
-        std::pair<double , double> bounds[3];
+        double mid;
+        BoundBox box;
         std::vector<std::shared_ptr<Shape> > shapes_;
         short height;
         int childs[2];
@@ -30,8 +43,19 @@ private:
     void partition_(const std::vector<std::shared_ptr<Shape> > & data,
                     std::vector<std::shared_ptr<Shape> > & left ,
                     std::vector<std::shared_ptr<Shape> > & right,
-                    double mid,
+                    long double mid,
+                    int id_mid,
                     dim dim) const;
+    
+    
+    std::pair<long double, std::shared_ptr<Shape> >
+    find_intersection_(int id,
+                       std::pair<long double ,long double > intersection_dists ,
+                       const Ray & ray) const;
+    
+    
+    std::pair<long double , std::shared_ptr<Shape> >intersect_with_shapes_(const std::vector<std::shared_ptr<Shape> > & shapes,
+                                                   const Ray & ray) const ;
     
     std::vector<Node> nodes_;
     static const int EMPTY_PARTITION_LIMIT_ = 3;

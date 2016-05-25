@@ -9,6 +9,7 @@
 #ifndef SceneProcessor_hpp
 #define SceneProcessor_hpp
 #include "Structs.h"
+#include "KDtree.hpp"
 #include <vector>
 
 class SceneProcessor {
@@ -20,12 +21,13 @@ public:
     
     SceneProcessor & setScreenPosition(crd corner, crd a, crd b, int width , int height);
     SceneProcessor & setObserverPosition(crd pos);
-    SceneProcessor & setBaseIntensity(double value);
+    SceneProcessor & setBaseIntensity(long double value);
     std::vector<std::vector<Color> > buildScene();
     
 private:
     std::vector<std::shared_ptr<Shape> > shapes_;
     std::vector<std::shared_ptr<Light> > light_;
+    KDtree tree_;
     
     crd scr_a_;
     crd scr_b_;
@@ -35,12 +37,11 @@ private:
     
     crd obsr_pos_;
     
-    double base_light;
+    long double base_light;
     
-    std::pair<int , double> find_ray_intersection_(const Ray & ray) const;
-    Color get_pix_color_(int id , double dist , const Ray & ray) const;
-    double get_intensity_(const crd & pt, const crd & normal) const;
-    Color transform_color_(Color color , double ext_intensity) const;
+    Color get_pix_color_(std::shared_ptr<Shape> shape , long double dist , const Ray & ray) const;
+    long double get_intensity_(const crd & pt, const crd & normal) const;
+    Color transform_color_(Color color , long double ext_intensity) const;
 };
 
 #endif /* SceneProcessor_hpp */
