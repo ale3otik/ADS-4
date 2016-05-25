@@ -6,9 +6,10 @@
 //  Copyright © 2016 Alex. All rights reserved.
 //
 
+#include "Structs.h"
 #ifndef KDtree_hpp
 #define KDtree_hpp
-#include "Structs.h"
+
 
 class KDtree {
 public:

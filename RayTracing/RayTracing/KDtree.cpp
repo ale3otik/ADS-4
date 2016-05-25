@@ -214,7 +214,7 @@ void KDtree::build_node_(int node_idx, dim div_dim, int empty_partition_cnt) {
     memcpy(r->box.lims,node.box.lims, sizeof(node.box.lims));
     l->box.lims[div_dim].second = mid;
     r->box.lims[div_dim].first = mid;
-    vector<Node *> childs = {l,r};
+//    vector<Node *> childs = {l,r};
 //    for(const auto & pt : childs) {
 //        if(l->box.lims[div_dim].second - pt->box.lims[div_dim].first < EPS) {
 //            l->box.lims[div_dim].first -= EPS;

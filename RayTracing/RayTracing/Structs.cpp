@@ -24,15 +24,15 @@ long double crd::len2() const {
     return x * x + y*y + z * z;
 }
 
-inline crd operator -(const crd & a , const crd & b) {
+crd operator -(const crd & a , const crd & b) {
     return crd(a.x - b.x , a.y - b.y , a.z - b.z);
 }
 
-inline crd operator +(const crd & a , const crd & b) {
+crd operator +(const crd & a , const crd & b) {
     return crd(a.x + b.x , a.y + b.y , a.z + b.z);
 }
 
-inline  crd operator * (const long double & cof , const crd & v) {
+crd operator * (const long double & cof , const crd & v) {
     return crd(cof * v.x ,cof * v.y ,cof * v.z);
 }
 
@@ -86,7 +86,7 @@ inline  long double get_det3(const vector<crd> & cs) {
 
 }
 
-inline crd solveMatrix3(const std::vector<crd> & columns , crd b) {
+crd solveMatrix3(const std::vector<crd> & columns , crd b) {
     assert(columns.size() == 3);
     vector<crd> new_columns = columns;
     long double det = get_det3(new_columns);
@@ -101,17 +101,17 @@ inline crd solveMatrix3(const std::vector<crd> & columns , crd b) {
     return crd(d[0]/det , d[1] / det , d[2] / det);
 }
 
-inline crd normalize(const crd & vc) {
+crd normalize(const crd & vc) {
     long double len = vc.length();
     if(len < EPS) return crd(0,0,0);
     return (1.0/len) * vc;
 }
 
-inline long double scal(const crd & a , const crd & b) {
+long double scal(const crd & a , const crd & b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-inline crd mult(const crd & a , const crd & b) {
+crd mult(const crd & a , const crd & b) {
     return crd(a.z * b.y - a.y * b.z,
                a.x * b.z - a.z * b.x,
                a.y * b.x - a.x * b.y);
@@ -130,7 +130,7 @@ Triangle::Triangle(crd nvertices_[3]) {
     
     crd & v = vertices_[0];
     D_ = - scal(normal_,v);
-    assert(normal_.length() > EPS);
+//    assert(normal_.length() > EPS);
 }
 
 Color Triangle::getColor() const {

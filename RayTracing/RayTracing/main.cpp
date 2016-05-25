@@ -9,34 +9,57 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+
+#include "Object.hpp"
+#include "KDtree.hpp"
+#include "Structs.h"
+
 #include "PPMTransformer.hpp"
 #include "SceneProcessor.hpp"
-#include "Structs.h"
+
 #include <chrono>
-#include "KDtree.hpp"
-#include "Object.hpp"
-using namespace std;
+
+using std::vector;
+using std::shared_ptr;
+using std::cout;
+using std::endl;
 int main() {
     
 //    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::getShapesFromFile("elements.txt");
-    vector<std::shared_ptr<Shape> > shapesGirya = PPMTransformer::scanDataFromASCISTL("stl/girya.stl");
-    vector<std::shared_ptr<Shape> > shapesChrist = PPMTransformer::scanDataFromASCISTL("stl/chri.stl");
+//    vector<std::shared_ptr<Shape> > shapesGirya = PPMTransformer::scanDataFromASCISTL("stl/girya.stl");
+//    vector<std::shared_ptr<Shape> > shapesChrist = PPMTransformer::scanDataFromASCISTL("stl/chri.stl");
+//    
+//    Object::rescale(shapesGirya, 25);
+//    Object::setPosition(shapesGirya, crd(0,0,-200));
+//    Object::rescale(shapesChrist, 1e-1);
+//    Object::setPosition(shapesChrist, crd(-40,0,100));
+//    
+//    vector<std::shared_ptr<Shape> > shapes(shapesGirya.size() + shapesChrist.size());
+//    
+//    std::merge(shapesChrist.begin(),shapesChrist.end(),shapesGirya.begin(),shapesGirya.end(),shapes.begin());
+//
     
-    Object::rescale(shapesGirya, 25);
-    Object::setPosition(shapesGirya, crd(0,0,-200));
-    Object::rescale(shapesChrist, 1e-1);
-    Object::setPosition(shapesChrist, crd(-40,0,100));
+    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::scanDataFromASCISTL("stl/nudegirl4.stl");
+        Object::rescale(shapes, 25);
+    Object::setPosition(shapes, crd(300,-150,-200));
     
-    vector<std::shared_ptr<Shape> > shapes(shapesGirya.size() + shapesChrist.size());
+//    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::scanDataFromASCISTL("stl/panther_at_the_beach.stl");
+//    Object::rescale(shapes, 7);
+//    Object::setPosition(shapes, crd(0,0,-200));
+
+//    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::scanDataFromASCISTL("stl/chick.stl");
+//    Object::rescale(shapes, 12);
+//    Object::setPosition(shapes, crd(50,-50,0));
     
-    std::merge(shapesChrist.begin(),shapesChrist.end(),shapesGirya.begin(),shapesGirya.end(),shapes.begin());
     
     vector<std::shared_ptr<Light> > light = PPMTransformer::getLightFromFile("stl/light.txt");
+    
+    
     
     int width = 1200;
     int height = 1200;
     
-    crd corner(-width/2 + 300 , height/2 , 800);
+    crd corner(-width/2 + 300 , height/2 , -800);
     crd nline = normalize(crd(0.2 , -0.2, 1.0));
     crd a(1, -0.1 ,-0.2);
     crd b = normalize(mult(nline, a));
@@ -44,7 +67,7 @@ int main() {
     a = normalize(mult(b,nline));
     cout << a.x << " " << a.y << " " << a.z <<endl;
     cout << scal(a, b) <<endl;
-    long double distobs = 3000;
+    long double distobs = -3000;
     crd obs = corner + (width/2.0) * a + (height/2.0) * b + distobs * nline;
     
     
