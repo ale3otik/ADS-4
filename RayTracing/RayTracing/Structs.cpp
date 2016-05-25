@@ -141,6 +141,33 @@ void Triangle::setColor(const Color & color) {
     material_.color = color;
 }
 
+void Triangle::move(crd dir, long double length) {
+    dir = normalize(dir);
+    dir = length * dir;
+    for(int i = 0; i < 3; ++i) {
+        vertices_[i] = dir + vertices_[i];
+    }
+    
+    Triangle t(vertices_);
+    t.setColor(this->getColor());
+    *this = t;
+}
+void Triangle::rescale(long double rate) {
+    for(int i = 0; i < 3; ++i) {
+        vertices_[i] = rate * vertices_[i];
+    }
+    Triangle t(vertices_);
+    t.setColor(this->getColor());
+    *this = t;
+}
+
+crd Triangle::getWeightCenter() const {
+    crd res = crd(0,0,0);
+    for(int i = 0; i < 3; ++i) {
+        res = res + vertices_[i];
+    }
+    return (1.0/3.0) * res;
+}
 
 std::pair<bool , long double> Triangle::getIntersection(const Ray & ray) const {
     long double dist = get_dist_(ray.pt);
@@ -231,6 +258,20 @@ crd Sphere::getNormal(const crd & point) const {
     }
     return normal;
 }
+
+void Sphere::move(crd dir, long double length) {
+    dir = normalize(dir);
+    dir = length * dir;
+    center_ = dir + center_;
+}
+void Sphere::rescale(long double rate) {
+    radius_ *= rate;
+}
+
+crd Sphere::getWeightCenter() const {
+    return center_;
+}
+
 
 Color Sphere::getColor() const {
     return material_.color;

@@ -14,15 +14,19 @@
 #include "Structs.h"
 #include <chrono>
 #include "KDtree.hpp"
-
+#include "Object.hpp"
 using namespace std;
 int main() {
     
-    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::getShapesFromFile("elements.txt");
+//    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::getShapesFromFile("elements.txt");
+    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::scanDataFromASCISTL("chri.stl");
+    Object::rescale(shapes, 0.5);
+    Object::setPosition(shapes, crd(0,0,-200));
+    
     vector<std::shared_ptr<Light> > light = PPMTransformer::getLightFromFile("light.txt");
     
-    int width = 1280;
-    int height = 720;
+    int width = 1000;
+    int height = 2000;
     
     crd corner(-width/2 , height/2 , -1000);
     crd nline = normalize(crd(0.2 , -0.2, 1.0));

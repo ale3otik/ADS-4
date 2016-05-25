@@ -18,6 +18,7 @@ class PPMTransformer {
 public:
     static void transformToPPM(std::vector<std::vector<Color> > data , const std::string & fname);
     static std::vector<std::shared_ptr<Shape> > getShapesFromFile(const std::string & fname);
+    static std::vector<std::shared_ptr<Shape> > scanDataFromASCISTL(const std::string & fname);
     static std::vector<std::shared_ptr<Light> > getLightFromFile(const std::string & fname);
 };
 

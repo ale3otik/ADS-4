@@ -93,3 +93,33 @@ std::vector<std::shared_ptr<Light> > PPMTransformer::getLightFromFile(const std:
     file.close();
     return result;
 }
+
+std::vector<std::shared_ptr<Shape> > PPMTransformer::scanDataFromASCISTL(const std::string & fname) {
+    std::vector<std::shared_ptr<Shape> > shapes;
+    std::ifstream file(fname);
+    assert(file.is_open());
+    std::string s;
+    file >> s;
+    if(s != "solid") {
+        assert(0);
+    }
+    file >> s >> s;
+    while(s != "endsolid") {
+        file >> s;
+        crd norm;
+        file >> norm.x >> norm.y >> norm.z;
+        file >> s >> s;
+        crd v[3];
+        for(int i = 0;i < 3;++i) {
+            file >> s;
+            file >> v[i].x >> v[i].z >> v[i].y;
+//            v[i].x *= 1e2; v[i].y *= 1e2; v[i].z *= 1e2;
+        }
+        std::shared_ptr<Shape> tr = std::shared_ptr<Shape>(new Triangle(v));
+        tr->setColor(Color(100,100,100));
+        shapes.push_back(tr);
+        file >> s >> s >> s;
+    }
+    file.close();
+    return shapes;
+}

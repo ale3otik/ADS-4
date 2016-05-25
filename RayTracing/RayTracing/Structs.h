@@ -90,7 +90,10 @@ public:
     virtual crd getNormal(const crd & point) const = 0;
     virtual Color getColor() const = 0;
     virtual void setColor(const Color & color) = 0;
+    virtual void move(crd dir, long double length) = 0;
+    virtual void rescale(long double rate) = 0;
     virtual std::pair<long double, long double> getBoundRange(dim dim) const = 0;
+    virtual crd getWeightCenter() const = 0;
 };
 
 class Triangle : public Shape {
@@ -103,6 +106,9 @@ public:
     Color getColor() const;
     void setColor(const Color & color);
     std::pair<long double, long double> getBoundRange(dim dim) const;
+    void move(crd dir, long double length);
+    void rescale(long double rate);
+    crd getWeightCenter() const;
     
 private:
     bool is_inside_(const crd & point) const;
@@ -126,6 +132,9 @@ public:
     Color getColor() const;
     void setColor(const Color & color);
     std::pair<long double, long double> getBoundRange(dim dim) const;
+    void move(crd dir, long double length);
+    void rescale(long double rate);
+    crd getWeightCenter() const;
 private:
     crd center_;
     long double radius_;
