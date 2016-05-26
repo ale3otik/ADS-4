@@ -19,13 +19,14 @@
 
 #include <chrono>
 
+
 using std::vector;
 using std::shared_ptr;
 using std::cout;
 using std::endl;
 int main() {
     
-    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::getShapesFromFile("stl/serg_scene.txt");
+//    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::getShapesFromFile("stl/serg_scene.txt");
 //    vector<std::shared_ptr<Shape> > shapesGirya = PPMTransformer::scanDataFromASCISTL("stl/girya.stl");
 //    vector<std::shared_ptr<Shape> > shapesChrist = PPMTransformer::scanDataFromASCISTL("stl/chri.stl");
 //    
@@ -47,27 +48,31 @@ int main() {
 //    Object::rescale(shapes, 7);
 //    Object::setPosition(shapes, crd(0,0,-200));
 
-//    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::scanDataFromASCISTL("stl/chick.stl");
-//    Object::rescale(shapes, 12);
-//    Object::setPosition(shapes, crd(50,-50,0));
+    vector<std::shared_ptr<Shape> > shapesFlats = PPMTransformer::getShapesFromFile("stl/flats.txt");
+    vector<std::shared_ptr<Shape> > shapesGirl = PPMTransformer::scanDataFromASCISTL("stl/nudegirl4.stl");
+    vector<std::shared_ptr<Shape> > shapes(shapesFlats.size() + shapesGirl.size());
+    Object::rescale(shapesGirl, 2);
+    Object::setPosition(shapesGirl, crd(0,0,0));
+    std::merge(shapesFlats.begin(),shapesFlats.end(),shapesGirl.begin(),shapesGirl.end(),shapes.begin());
+//    Object::rescale(shapes, 1e-1);
     
-    
-    vector<std::shared_ptr<Light> > light = PPMTransformer::getLightFromFile("stl/serg_light.txt");
+    vector<std::shared_ptr<Light> > light = PPMTransformer::getLightFromFile("stl/light.txt");
     
     
     
     int width = 2000;
     int height = 1500;
     
-    crd corner(-width/2 , height/2 , -800);
+    crd corner(-width/20.0 , height/20.0 , -40);
+//       crd corner(-width/2 , height/2 , -800);
     crd nline = normalize(crd(0.2 , -0.2, 1.0));
     crd a(1, -0.1 ,-0.2);
-    crd b = normalize(mult(nline, a));
+    crd b = 0.1 * normalize(mult(nline, a));
     cout << b.x << " " << b.y << " " <<b.z <<endl;
-    a = normalize(mult(b,nline));
+    a = 0.1 * normalize(mult(b,nline));
     cout << a.x << " " << a.y << " " << a.z <<endl;
     cout << scal(a, b) <<endl;
-    long double distobs = -3000;
+    long double distobs = -100;
     crd obs = corner + (width/2.0) * a + (height/2.0) * b + distobs * nline;
     
     

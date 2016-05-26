@@ -7,6 +7,8 @@
 //
 
 #include "SceneProcessor.hpp"
+#include "ThreadPool.hpp"
+
 #include <cmath>
 #include <cassert>
 #include <iostream> 
@@ -15,6 +17,31 @@ using std::vector;
 using std::pair;
 using std::shared_ptr;
 typedef long double ld;
+
+#define MULTITHREADING_
+
+process_worker::process_worker(int y , int x, SceneProcessor * processor) {
+        x_ = x;
+        y_ = y;
+        processor_ = processor;
+}
+
+void process_worker::operator()() {
+        processor_->process_pixel_(y_, x_);
+}
+
+void SceneProcessor::process_pixel_(int y , int x) {
+    crd pix_pos = scr_corner_ + (long double)(x + 1) * scr_a_ + (long double)(y + 1) * scr_b_;
+    Ray r(pix_pos , pix_pos - obsr_pos_);
+    pair<long double, std::shared_ptr<Shape> > intrs = tree_.findIntrsection(r);
+    if(intrs.first < 0) {
+        result_[y][x] = Color(0,0,0);
+    }
+    else {
+        result_[y][x] = get_pix_color_(intrs.second, intrs.first, r,1.0);
+    }
+}
+
 SceneProcessor & SceneProcessor::setScene(const std::vector<std::shared_ptr<Shape> > & shapes,
                                           const std::vector<std::shared_ptr<Light> > & light) {
     shapes_ = shapes;
@@ -44,21 +71,28 @@ SceneProcessor & SceneProcessor::setBaseIntensity(long double value) {
 
 vector<vector<Color> > SceneProcessor::buildScene() {
     tree_.buildTree(shapes_);
-    vector<vector<Color> > result(height_ , vector<Color> (width_));
+    result_ = vector<vector<Color> > (height_ , vector<Color> (width_));
+
+    
+#ifndef MULTITHREADING_
     for(int y = 0; y < height_; ++ y) {
         for(int x = 0; x < width_; ++ x) {
-            crd pix_pos = scr_corner_ + (long double)(x + 1) * scr_a_ + (long double)(y + 1) * scr_b_;
-            Ray r(pix_pos , pix_pos - obsr_pos_);
-            pair<long double, std::shared_ptr<Shape> > intrs = tree_.findIntrsection(r);
-            if(intrs.first < 0) {
-                result[y][x] = Color(0,0,0);
-            }
-            else {
-                result[y][x] = get_pix_color_(intrs.second, intrs.first, r,1.0);
-            }
+            process_pixel_(y, x);
         }
     }
-    return result;
+#else
+    
+    thread_pool<void> thread_pool;
+    for(int y = 0; y < height_; ++ y) {
+        for(int x = 0; x < width_; ++ x) {
+            thread_pool.submit(process_worker(y,x,this));
+        }
+    }
+    thread_pool.shutdown();
+    
+#endif
+    
+    return result_;
 }
 
 long double SceneProcessor::get_intensity_(const crd & pt, const crd & normal) const {
