@@ -124,7 +124,7 @@ KDtree & KDtree::buildTree(const vector<shared_ptr<Shape> > & shapes) {
     node.shapes_ = shapes;
     nodes_.push_back(node);
     
-    build_node_(0, Dim::x, 0);
+    build_node_(0, Dim::x, 0 , 0);
     return *this;
 }
 
@@ -175,7 +175,7 @@ void KDtree::partition_(const vector<shared_ptr<Shape> > & data,
     }
 }
 
-void KDtree::build_node_(int node_idx, dim div_dim, int empty_partition_cnt) {
+void KDtree::build_node_(int node_idx, dim div_dim, int empty_partition_cnt, int qnt) {
     
     memset(nodes_[node_idx].childs, 0 , 2 * sizeof(int));
     if(nodes_[node_idx].parent > 0) {
@@ -194,13 +194,17 @@ void KDtree::build_node_(int node_idx, dim div_dim, int empty_partition_cnt) {
     node.childs[0] = id_l;
     node.childs[1] = id_r;
     
+    ld mid;
+    int mid_id = -1;
     std::sort(node.shapes_.begin(), node.shapes_.end(),ShapeCmp(div_dim, node.box.lims[div_dim]));
     
-    int mid_id = size(node.shapes_) / 2;
+    mid_id = size(node.shapes_) / 2;
+        
     Range bounds = node.shapes_[mid_id]->getBoundRange(div_dim);
     bounds.first = std::max(bounds.first, node.box.lims[div_dim].first);
     bounds.second = std::min(bounds.second, node.box.lims[div_dim].second);
-    ld mid = bounds.first - 2.0 * EPS;
+    mid = bounds.first - 2.0 * EPS;
+
     node.mid = mid;
     
     Node * l = &nodes_[id_l];
@@ -222,8 +226,10 @@ void KDtree::build_node_(int node_idx, dim div_dim, int empty_partition_cnt) {
 //        }
 //    }
     
-    build_node_(id_l, Dim::next(div_dim), size(node.shapes_) == size(l->shapes_)?empty_partition_cnt+1:0);
-    build_node_(id_r, Dim::next(div_dim), size(node.shapes_) == size(r->shapes_)?empty_partition_cnt+1:0);
+    if(qnt <= 6) ++qnt;
+    
+    build_node_(id_l, Dim::next(div_dim), size(node.shapes_) == size(l->shapes_)?empty_partition_cnt+1:0 , qnt);
+    build_node_(id_r, Dim::next(div_dim), size(node.shapes_) == size(r->shapes_)?empty_partition_cnt+1:0, qnt);
 }
 
 /************************TRACE RAY**************************/

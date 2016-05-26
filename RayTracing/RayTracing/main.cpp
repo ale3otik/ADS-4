@@ -25,7 +25,7 @@ using std::cout;
 using std::endl;
 int main() {
     
-//    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::getShapesFromFile("elements.txt");
+    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::getShapesFromFile("stl/serg_scene.txt");
 //    vector<std::shared_ptr<Shape> > shapesGirya = PPMTransformer::scanDataFromASCISTL("stl/girya.stl");
 //    vector<std::shared_ptr<Shape> > shapesChrist = PPMTransformer::scanDataFromASCISTL("stl/chri.stl");
 //    
@@ -39,9 +39,9 @@ int main() {
 //    std::merge(shapesChrist.begin(),shapesChrist.end(),shapesGirya.begin(),shapesGirya.end(),shapes.begin());
 //
     
-    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::scanDataFromASCISTL("stl/nudegirl4.stl");
-        Object::rescale(shapes, 25);
-    Object::setPosition(shapes, crd(300,-150,-200));
+//    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::scanDataFromASCISTL("stl/gnomik.stl");
+//        Object::rescale(shapes, 25);
+//    Object::setPosition(shapes, crd(300,-150,-200));
     
 //    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::scanDataFromASCISTL("stl/panther_at_the_beach.stl");
 //    Object::rescale(shapes, 7);
@@ -52,14 +52,14 @@ int main() {
 //    Object::setPosition(shapes, crd(50,-50,0));
     
     
-    vector<std::shared_ptr<Light> > light = PPMTransformer::getLightFromFile("stl/light.txt");
+    vector<std::shared_ptr<Light> > light = PPMTransformer::getLightFromFile("stl/serg_light.txt");
     
     
     
-    int width = 1200;
-    int height = 1200;
+    int width = 2000;
+    int height = 1500;
     
-    crd corner(-width/2 + 300 , height/2 , -800);
+    crd corner(-width/2 , height/2 , -800);
     crd nline = normalize(crd(0.2 , -0.2, 1.0));
     crd a(1, -0.1 ,-0.2);
     crd b = normalize(mult(nline, a));

@@ -94,6 +94,8 @@ public:
     virtual void rescale(long double rate) = 0;
     virtual std::pair<long double, long double> getBoundRange(dim dim) const = 0;
     virtual crd getWeightCenter() const = 0;
+    virtual void setMirrorRate(long double val) = 0;
+    virtual long double getMirrorRate() const = 0;
 };
 
 class Triangle : public Shape {
@@ -109,6 +111,8 @@ public:
     void move(crd dir, long double length);
     void rescale(long double rate);
     crd getWeightCenter() const;
+    void  setMirrorRate(long double val);
+    long double  getMirrorRate() const;
     
 private:
     bool is_inside_(const crd & point) const;
@@ -118,6 +122,7 @@ private:
     long double D_; // from Ax + By + Cz + D = 0
     crd vertices_[3];
     Material material_;
+    long double mirror_rate_;
     
     /* .. another params ..*/
 };
@@ -135,10 +140,13 @@ public:
     void move(crd dir, long double length);
     void rescale(long double rate);
     crd getWeightCenter() const;
+    void  setMirrorRate(long double val);
+    long double  getMirrorRate() const;
 private:
     crd center_;
     long double radius_;
     Material material_;
+    long double mirror_rate_;
 };
 
 

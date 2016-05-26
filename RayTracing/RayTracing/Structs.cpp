@@ -127,6 +127,7 @@ Ray::Ray(const crd & pt_ , const crd & dir_) {
 Triangle::Triangle(crd nvertices_[3]) {
     memcpy(vertices_, nvertices_, 3 * sizeof(crd));
     normal_ = normalize(mult(vertices_[1] - vertices_[0], vertices_[2] - vertices_[0]));
+    mirror_rate_ = 0;
     
     crd & v = vertices_[0];
     D_ = - scal(normal_,v);
@@ -167,6 +168,14 @@ crd Triangle::getWeightCenter() const {
         res = res + vertices_[i];
     }
     return (1.0/3.0) * res;
+}
+
+void  Triangle::setMirrorRate(long double val) {
+    assert(val >= 0 - EPS && val <= 1 + EPS);
+    mirror_rate_ = val;
+}
+long double Triangle::getMirrorRate() const {
+    return mirror_rate_;
 }
 
 std::pair<bool , long double> Triangle::getIntersection(const Ray & ray) const {
@@ -217,6 +226,7 @@ pair<long double, long double> Triangle::getBoundRange(dim dim) const {
 Sphere::Sphere(crd center, long double radius) {
     center_ = center;
     radius_ = radius;
+    mirror_rate_ = 0;
 }
 
 pair<long double, long double> Sphere::getBoundRange(dim dim) const {
@@ -279,6 +289,14 @@ Color Sphere::getColor() const {
 
 void Sphere::setColor(const Color & color) {
     material_.color = color;
+}
+
+void  Sphere::setMirrorRate(long double val) {
+    assert(val >= -EPS && val <= 1 + EPS);
+    mirror_rate_ = val;
+}
+long double Sphere::getMirrorRate() const {
+    return mirror_rate_;
 }
 
 /*************************************/

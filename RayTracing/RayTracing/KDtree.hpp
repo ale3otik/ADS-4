@@ -39,7 +39,7 @@ private:
         int parent;
     };
     
-    void build_node_(int node, dim div_dim,int empty_partition_cnt);
+    void build_node_(int node, dim div_dim,int empty_partition_cnt, int qnt);
     bool is_time_to_stop_(int nodem, int empty_partition_cnt) const;
     void partition_(const std::vector<std::shared_ptr<Shape> > & data,
                     std::vector<std::shared_ptr<Shape> > & left ,

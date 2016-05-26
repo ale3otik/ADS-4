@@ -14,7 +14,7 @@
 
 class SceneProcessor {
 public:
-    SceneProcessor(): base_light(0.2) {};
+    SceneProcessor(): base_light(0.1) {};
     
     SceneProcessor & setScene(const std::vector<std::shared_ptr<Shape> > & shapes ,
                               const std::vector<std::shared_ptr<Light> > & light);
@@ -39,9 +39,10 @@ private:
     
     long double base_light;
     
-    Color get_pix_color_(std::shared_ptr<Shape> shape , long double dist , const Ray & ray) const;
+    Color get_pix_color_(std::shared_ptr<Shape> shape , long double dist , const Ray & ray, double rate) const;
+    crd get_reflected_ray(const crd normal , const crd & ray) const ;
     long double get_intensity_(const crd & pt, const crd & normal) const;
-    Color transform_color_(Color color , long double ext_intensity) const;
+    Color transform_color_(std::shared_ptr<Shape> shape, Color reflexed_color , long double ext_intensity) const;
 };
 
 #endif /* SceneProcessor_hpp */

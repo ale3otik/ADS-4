@@ -14,7 +14,7 @@
 using std::vector;
 using std::pair;
 using std::shared_ptr;
-
+typedef long double ld;
 SceneProcessor & SceneProcessor::setScene(const std::vector<std::shared_ptr<Shape> > & shapes,
                                           const std::vector<std::shared_ptr<Light> > & light) {
     shapes_ = shapes;
@@ -54,7 +54,7 @@ vector<vector<Color> > SceneProcessor::buildScene() {
                 result[y][x] = Color(0,0,0);
             }
             else {
-                result[y][x] = get_pix_color_(intrs.second, intrs.first, r);
+                result[y][x] = get_pix_color_(intrs.second, intrs.first, r,1.0);
             }
         }
     }
@@ -80,15 +80,26 @@ long double SceneProcessor::get_intensity_(const crd & pt, const crd & normal) c
     return intensity;
 }
 
-Color SceneProcessor::transform_color_(Color color , long double intensity) const {
+Color SceneProcessor::transform_color_(std::shared_ptr<Shape> shape, Color reflexed_color , long double intensity) const {
     intensity += base_light;
-    color.r = std::min((int)(intensity * (long double)color.r + 0.5), 255);
-    color.g = std::min((int)(intensity * (long double)color.g + 0.5), 255);
-    color.b = std::min((int)(intensity * (long double)color.b + 0.5), 255);
+    Color color = shape->getColor();
+    ld rate = shape->getMirrorRate();
+    
+    color.r = std::min((int)((1.0 - rate) * intensity * (ld)color.r + rate * (ld)reflexed_color.r + 0.5), 255);
+    color.g = std::min((int)((1.0 - rate) * intensity * (ld)color.g + rate * (ld)reflexed_color.g + 0.5), 255);
+    color.b = std::min((int)((1.0 - rate) * intensity * (ld)color.b + rate * (ld)reflexed_color.b + 0.5), 255);
     return color;
 }
 
-Color SceneProcessor::get_pix_color_(shared_ptr<Shape> shape, long double dist, const Ray & ray) const {
+crd SceneProcessor::get_reflected_ray(crd normal , const crd & ray) const {
+    ld cos = scal(normal, (-1) * ray);
+    if(cos < EPS) return crd(0,0,0);
+    normal = cos *  normal;
+    crd offset = normal + ray;
+    return normalize(normal + offset);
+}
+
+Color SceneProcessor::get_pix_color_(shared_ptr<Shape> shape, long double dist, const Ray & ray, double rate) const {
     
     crd pt = ray.pt + dist * ray.dir;
     crd normal = shape->getNormal(pt);
@@ -97,8 +108,21 @@ Color SceneProcessor::get_pix_color_(shared_ptr<Shape> shape, long double dist, 
     }
     
     long double intensity = get_intensity_(pt , normal);
-//    if(fabs(intensity) > EPS) {
-//        std::cout << intensity <<std::endl;
-//    }
-    return transform_color_(shape->getColor() , intensity);
+    if(shape->getMirrorRate() < EPS) {
+        
+    }
+    Color mirror_clr = Color(0,0,0);
+    if(rate * shape->getMirrorRate() > 0.1) {
+        crd reflected_dir = get_reflected_ray(normal, ray.dir);
+        crd reflected_pt = ray.pt + dist * ray.dir + 2 * EPS * normal + 2 * EPS * reflected_dir;
+        Ray reflected_ray(reflected_pt,reflected_dir);
+        
+        pair<long double, std::shared_ptr<Shape> > intrs = tree_.findIntrsection(reflected_ray);
+        
+        if(intrs.first >= 0) {
+            mirror_clr = get_pix_color_(intrs.second, intrs.first, reflected_ray, rate * shape->getMirrorRate());
+        }
+    }
+
+    return transform_color_(shape, mirror_clr, intensity);
 }

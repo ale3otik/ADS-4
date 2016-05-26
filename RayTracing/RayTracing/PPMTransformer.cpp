@@ -42,7 +42,9 @@ std::vector<std::shared_ptr<Shape> > PPMTransformer::getShapesFromFile(const std
         int id;
         file >> id;
         Color clr;
+        long double mirror_rate;
         file >> clr.r >> clr.g >> clr.b;
+        file >> mirror_rate;
         clr.r = std::max(5,clr.r);
         clr.g = std::max(5,clr.g);
         clr.b = std::max(5,clr.b);
@@ -54,6 +56,7 @@ std::vector<std::shared_ptr<Shape> > PPMTransformer::getShapesFromFile(const std
             
             std::shared_ptr<Triangle> t(new Triangle(vertices));
             t->setColor(clr);
+            t->setMirrorRate(mirror_rate);
             result[i] = t;
         } else if(id == 2) {
             crd center;
@@ -62,6 +65,7 @@ std::vector<std::shared_ptr<Shape> > PPMTransformer::getShapesFromFile(const std
             file >> radius;
             std::shared_ptr<Sphere> s(new Sphere(center,radius));
             s->setColor(clr);
+            s->setMirrorRate(mirror_rate);
             result[i] = s;
         } else {
             return result;
