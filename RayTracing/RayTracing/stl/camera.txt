@@ -1,0 +1,9 @@
+width 2000
+height 1500
+corner -1000 750 -800
+nline 0.2 -0.2 1.0
+a 1 -0.1 -0.2
+coef 0.9
+distobs -3000
+
+cinfo

@@ -13,6 +13,7 @@
 
 const long double EPS = 1e-9;
 
+
 typedef short dim;
 struct Dim {
     static dim next(dim a) {
@@ -53,6 +54,17 @@ struct crd {
     long double len2() const;
     long double x,y,z;
 };
+
+struct camera_info{
+    int width;
+    int height;
+    crd corner;
+    crd nline;
+    crd a,b;
+    long double coef;
+    long double distobs;
+};
+
 
 struct Light {
     Light(){};

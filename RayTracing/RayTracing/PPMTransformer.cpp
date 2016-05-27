@@ -191,3 +191,28 @@ void PPMTransformer::scanTextureInfoFromFile(const std::string & fname,
     
     file.close();
 }
+
+camera_info PPMTransformer::getCameraInfo(const std::string & fname) {
+    
+    std::ifstream file(fname.c_str());
+    assert(file.is_open());
+    camera_info result;
+    std::string s;
+    file >> s;
+    file >> result.width;
+    file >> s;
+    file >> result.height;
+    file >> s;
+    file >> result.corner.x >> result.corner.y >> result.corner.z;
+    file >> s;
+    file >> result.nline.x >> result.nline.y >> result.nline.z;
+    result.nline = normalize(result.nline);
+    file >> s;
+    file >> result.a.x >> result.a.y >> result.a.z;
+    file >> s;
+    file >> result.coef;
+    file >> s;
+    file >> result.distobs;
+    file.close();
+    return result;
+}

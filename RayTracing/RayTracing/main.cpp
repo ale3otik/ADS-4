@@ -25,6 +25,9 @@ using std::shared_ptr;
 using std::cout;
 using std::endl;
 using std::map;
+
+
+
 int main() {
     
 //    vector<std::shared_ptr<Shape> > shapesGirya = PPMTransformer::scanDataFromASCISTL("stl/girya.stl");
@@ -70,33 +73,20 @@ int main() {
     
     vector<std::shared_ptr<Light> > light = PPMTransformer::getLightFromFile("stl/serg_light.txt");
     
+    camera_info cinfo = PPMTransformer::getCameraInfo("stl/camera.txt");
     
+    cout << cinfo.coef << " " << cinfo.distobs << endl;
     
-    int width = 2000;
-    int height = 1500;
-    
-//    crd corner(-width/20.0 , height/20.0 , -40);
-       crd corner(-width/2 , height/2 , -800);
-    crd nline = normalize(crd(0.2 , -0.2, 1.0));
-    crd a(1, -0.1 ,-0.2);
-    crd b =  0.9 * normalize(mult(nline, a));
-    cout << b.x << " " << b.y << " " <<b.z <<endl;
-    a =  0.9 * normalize(mult(b,nline));
-    cout << a.x << " " << a.y << " " << a.z <<endl;
-    cout << scal(a, b) <<endl;
-    long double distobs = -3000;
-    crd obs = corner + (width/2.0) * a + (height/2.0) * b + distobs * nline;
-    
-    
+    crd b =  cinfo.coef * normalize(mult(cinfo.nline, cinfo.a));
+    cinfo.a =  cinfo.coef * normalize(mult(b,cinfo.nline));
+    crd obs = cinfo.corner + (cinfo.width/2.0) * cinfo.a + (cinfo.height/2.0) * b + cinfo.distobs * cinfo.nline;
+    std:cout << "start" <<endl;
     std::chrono::time_point<std::chrono::system_clock> start, end;
     start = std::chrono::system_clock::now();
     
-//    KDtree tree = KDtree().buildTree(shapes);
-    
-    
     vector<vector<Color> > result = SceneProcessor()
                                     .setScene(shapes, light)
-                                    .setScreenPosition(corner, a, b , width , height)
+                                    .setScreenPosition(cinfo.corner, cinfo.a, b , cinfo.width , cinfo.height)
                                     .setObserverPosition(obs)
                                     .setTextures(textures)
                                     .buildScene();

@@ -30,6 +30,8 @@ public:
     static void scanTextureInfoFromFile(const std::string & fname,
                                         const std::map<std::string,int> & texture_id,
                                         const std::vector<std::shared_ptr<Shape> > & shapes);
+    
+    static camera_info getCameraInfo(const std::string & fname);
 };
 
 
