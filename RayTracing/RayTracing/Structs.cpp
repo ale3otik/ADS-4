@@ -16,7 +16,7 @@ using std::make_pair;
 using std::vector;
 typedef long double ld;
 typedef long long i64;
-
+#define PI (ld)3.1415926535
 
 void  Color::limit() {
     r = std::min(r,255);
@@ -349,8 +349,17 @@ Color Sphere::getColor() const {
     return material_.color;
 }
 
-Color Sphere::getTextureColor(const crd & pt , const Texture & texture) const {
-    return Color(0,0,0);
+Color Sphere::getTextureColor(const crd & point , const Texture & texture) const {
+    i64 ymax = texture.size();
+    i64 xmax = texture[0].size();
+    
+    crd pt = point - center_;
+    ld theta = acos(pt.x/sqrtl(pt.z * pt.z + pt.x*pt.x + pt.y * pt.y));
+    ld phi = atan(pt.x/pt.z);
+    if(pt.z < 0) phi += PI;
+    phi += PI/2.0;
+    
+    return texture[(i64) ((theta/PI) * ymax) % ymax][(i64) ( (phi/(2.0* PI))* xmax) % xmax];
 }
 
 void Sphere::setColor(const Color & color) {

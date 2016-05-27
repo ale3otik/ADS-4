@@ -59,7 +59,8 @@ int main() {
 //    std::merge(shapesFlats.begin(),shapesFlats.end(),shapesGirl.begin(),shapesGirl.end(),shapes.begin());
 //    Object::rescale(shapes, 1e-1);
     
-    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::getShapesFromFile("stl/serg_scene.txt");
+    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::getShapesFromFile("stl/spheres.txt");
+//    vector<std::shared_ptr<Shape> > shapes = PPMTransformer::getShapesFromFile("stl/serg_scene.txt");
     vector<Texture> textures(6);
     map<std::string, int> texture_id;
     textures[0] = PPMTransformer::scanTextureFromPPM("stl/images-2.txt","brick",0,texture_id);
