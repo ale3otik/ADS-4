@@ -32,12 +32,14 @@ public:
     SceneProcessor & setScreenPosition(crd corner, crd a, crd b, int width , int height);
     SceneProcessor & setObserverPosition(crd pos);
     SceneProcessor & setBaseIntensity(long double value);
+    SceneProcessor & setTextures(const std::vector<Texture> & data);
     std::vector<std::vector<Color> > buildScene();
     friend process_worker;
     
 private:
     std::vector<std::shared_ptr<Shape> > shapes_;
     std::vector<std::shared_ptr<Light> > light_;
+    std::vector<Texture> textures_;
     KDtree tree_;
     std::vector<std::vector<Color> > result_;
     
@@ -54,7 +56,11 @@ private:
     Color get_pix_color_(std::shared_ptr<Shape> shape , long double dist , const Ray & ray, double rate) const;
     crd get_reflected_ray(const crd normal , const crd & ray) const ;
     long double get_intensity_(const crd & pt, const crd & normal) const;
-    Color transform_color_(std::shared_ptr<Shape> shape, Color reflexed_color , long double ext_intensity) const;
+    Color transform_color_(std::shared_ptr<Shape> shape,
+                           const crd & point,
+                           Color reflexed_color,
+                           long double ext_intensity) const;
+    
     void process_pixel_(int y , int x);
     
 };

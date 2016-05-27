@@ -10,7 +10,6 @@
 #ifndef KDtree_hpp
 #define KDtree_hpp
 
-
 class KDtree {
 public:
     KDtree & buildTree(const std::vector<std::shared_ptr<Shape> > & shapes);
@@ -21,7 +20,6 @@ private:
     public:
         BoundBox(){};
         std::pair<long double , long double> lims[3];
-        
         std::pair<long double,long double> get_intersection(const Ray & ray) const;
     private:
         std::vector<crd> get_rect_(short id) const;
@@ -39,7 +37,7 @@ private:
         int parent;
     };
     
-    void build_node_(int node, dim div_dim,int empty_partition_cnt, int qnt);
+    void build_node_(int node, dim div_dim,int empty_partition_cnt);
     bool is_time_to_stop_(int nodem, int empty_partition_cnt) const;
     void partition_(const std::vector<std::shared_ptr<Shape> > & data,
                     std::vector<std::shared_ptr<Shape> > & left ,
@@ -55,8 +53,9 @@ private:
                        const Ray & ray) const;
     
     
-    std::pair<long double , std::shared_ptr<Shape> >intersect_with_shapes_(const std::vector<std::shared_ptr<Shape> > & shapes,
-                                                   const Ray & ray) const ;
+    std::pair<long double , std::shared_ptr<Shape> >
+    intersect_with_shapes_(const std::vector<std::shared_ptr<Shape> > & shapes,
+                           const Ray & ray) const ;
     
     std::vector<Node> nodes_;
     static const int EMPTY_PARTITION_LIMIT_ = 3;

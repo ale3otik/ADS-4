@@ -18,7 +18,7 @@ using std::pair;
 using std::shared_ptr;
 typedef long double ld;
 
-#define MULTITHREADING_
+//#define MULTITHREADING_
 
 process_worker::process_worker(int y , int x, SceneProcessor * processor) {
         x_ = x;
@@ -58,6 +58,12 @@ SceneProcessor & SceneProcessor::setScreenPosition(crd corner , crd a , crd b , 
     return *this;
 }
 
+SceneProcessor & SceneProcessor::setTextures(const std::vector<Texture> & data) {
+    textures_ = data;
+    return *this;
+}
+
+
 SceneProcessor & SceneProcessor::setObserverPosition(crd pos) {
     this->obsr_pos_ = pos;
     return *this;
@@ -75,16 +81,16 @@ vector<vector<Color> > SceneProcessor::buildScene() {
 
     
 #ifndef MULTITHREADING_
-    for(int y = 0; y < height_; ++ y) {
-        for(int x = 0; x < width_; ++ x) {
+    for(int y = 0; y < height_; ++y) {
+        for(int x = 0; x < width_; ++x) {
             process_pixel_(y, x);
         }
     }
 #else
     
     thread_pool<void> thread_pool;
-    for(int y = 0; y < height_; ++ y) {
-        for(int x = 0; x < width_; ++ x) {
+    for(int y = 0; y < height_; ++y) {
+        for(int x = 0; x < width_; ++x) {
             thread_pool.submit(process_worker(y,x,this));
         }
     }
@@ -114,14 +120,25 @@ long double SceneProcessor::get_intensity_(const crd & pt, const crd & normal) c
     return intensity;
 }
 
-Color SceneProcessor::transform_color_(std::shared_ptr<Shape> shape, Color reflexed_color , long double intensity) const {
+Color SceneProcessor::transform_color_(std::shared_ptr<Shape> shape,
+                                       const crd & point,
+                                       Color reflexed_color ,
+                                       long double intensity) const {
     intensity += base_light;
     Color color = shape->getColor();
+    int texture_id = shape->getTextureId();
+    Color texture_clr(0,0,0);
+    
+    if(texture_id >= 0) {
+        texture_clr = shape->getTextureColor(point, textures_[texture_id]);
+        color = ((1.0 - shape->getTextureRate()) * color  + shape->getTextureRate() * (Color(3,3,3) + texture_clr));
+    }
+    
     ld rate = shape->getMirrorRate();
     
-    color.r = std::min((int)((1.0 - rate) * intensity * (ld)color.r + rate * (ld)reflexed_color.r + 0.5), 255);
-    color.g = std::min((int)((1.0 - rate) * intensity * (ld)color.g + rate * (ld)reflexed_color.g + 0.5), 255);
-    color.b = std::min((int)((1.0 - rate) * intensity * (ld)color.b + rate * (ld)reflexed_color.b + 0.5), 255);
+    color = ((1.0 - rate) * intensity) * color + rate * reflexed_color;
+    color.limit();
+    
     return color;
 }
 
@@ -142,9 +159,7 @@ Color SceneProcessor::get_pix_color_(shared_ptr<Shape> shape, long double dist, 
     }
     
     long double intensity = get_intensity_(pt , normal);
-    if(shape->getMirrorRate() < EPS) {
-        
-    }
+    
     Color mirror_clr = Color(0,0,0);
     if(rate * shape->getMirrorRate() > 0.1) {
         crd reflected_dir = get_reflected_ray(normal, ray.dir);
@@ -157,6 +172,7 @@ Color SceneProcessor::get_pix_color_(shared_ptr<Shape> shape, long double dist, 
             mirror_clr = get_pix_color_(intrs.second, intrs.first, reflected_ray, rate * shape->getMirrorRate());
         }
     }
-
-    return transform_color_(shape, mirror_clr, intensity);
+    
+    
+    return transform_color_(shape, ray.pt + dist * ray.dir, mirror_clr, intensity);
 }

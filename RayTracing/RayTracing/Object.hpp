@@ -15,7 +15,7 @@ public:
     static void rescale(std::vector<std::shared_ptr<Shape> > & shapes , long double rate);
     static void move(std::vector<std::shared_ptr<Shape> > & shapes , crd dir , long double length);
     static void setPosition(std::vector<std::shared_ptr<Shape> > & shapes , crd pos);
-    static void turn90degrees(std::vector<std::shared_ptr<Shape> > & shapes, dim d);
+//    static void turn90degrees(std::vector<std::shared_ptr<Shape> > & shapes, dim d);
 };
 
 #endif /* Object_hpp */

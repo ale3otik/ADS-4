@@ -26,13 +26,19 @@ struct Dim {
 
 struct Color {
     Color(){};
-    Color(long double  r_ , long double g_ , long double b_) {
+    Color(int  r_ , int g_ , int b_) {
         r = r_;
         g = g_;
         b = b_;
     }
+    void limit();
     int r , g, b;
 };
+
+Color operator * (long double val , const Color & clr);
+Color operator + (const Color & a , const Color & b);
+
+typedef std::vector<std::vector<Color> > Texture;
 
 struct crd {
     crd(){};
@@ -89,6 +95,7 @@ public:
     virtual std::pair<bool, long double> getIntersection(const Ray & ray) const = 0;
     virtual crd getNormal(const crd & point) const = 0;
     virtual Color getColor() const = 0;
+    virtual Color getTextureColor(const crd & pt , const Texture & texture) const = 0;
     virtual void setColor(const Color & color) = 0;
     virtual void move(crd dir, long double length) = 0;
     virtual void rescale(long double rate) = 0;
@@ -96,6 +103,10 @@ public:
     virtual crd getWeightCenter() const = 0;
     virtual void setMirrorRate(long double val) = 0;
     virtual long double getMirrorRate() const = 0;
+    virtual int getTextureId() const = 0;
+    virtual long double getTextureRate() const = 0;
+    virtual void setTextureId(int) = 0;
+    virtual void setTextureRate(long double) = 0;
 };
 
 class Triangle : public Shape {
@@ -106,6 +117,7 @@ public:
     std::pair<bool , long double> getIntersection(const Ray & ray) const;
     crd getNormal(const crd & point) const;
     Color getColor() const;
+    Color getTextureColor(const crd & pt , const Texture & texture) const;
     void setColor(const Color & color);
     std::pair<long double, long double> getBoundRange(dim dim) const;
     void move(crd dir, long double length);
@@ -113,6 +125,11 @@ public:
     crd getWeightCenter() const;
     void  setMirrorRate(long double val);
     long double  getMirrorRate() const;
+    
+    int getTextureId() const;
+    long double getTextureRate() const;
+    void setTextureId(int);
+    void setTextureRate(long double);
     
 private:
     bool is_inside_(const crd & point) const;
@@ -123,6 +140,9 @@ private:
     crd vertices_[3];
     Material material_;
     long double mirror_rate_;
+    
+    long double texture_rate_;
+    int texture_id_;
     
     /* .. another params ..*/
 };
@@ -135,6 +155,7 @@ public:
     std::pair<bool , long double> getIntersection(const Ray & ray) const;
     crd getNormal(const crd & point) const;
     Color getColor() const;
+    Color getTextureColor(const crd & pt , const Texture & texture) const;
     void setColor(const Color & color);
     std::pair<long double, long double> getBoundRange(dim dim) const;
     void move(crd dir, long double length);
@@ -142,11 +163,19 @@ public:
     crd getWeightCenter() const;
     void  setMirrorRate(long double val);
     long double  getMirrorRate() const;
+    
+    int getTextureId() const;
+    long double getTextureRate() const;
+    void setTextureId(int);
+    void setTextureRate(long double);
 private:
     crd center_;
     long double radius_;
     Material material_;
     long double mirror_rate_;
+    
+    long double texture_rate_;
+    int texture_id_;
 };
 
 

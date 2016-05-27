@@ -13,6 +13,7 @@ using std::vector;
 using std::pair;
 using std::make_pair;
 using std::shared_ptr;
+
 #define size(x) (int)(x).size()
 typedef long double ld;
 typedef pair<ld,ld> Range;
@@ -25,6 +26,8 @@ inline short get_bit(unsigned short mask, unsigned short i) {
 vector<crd> KDtree::BoundBox::get_rect_(short id) const {
     unsigned short mask = 1 << id;
     vector<crd> rect(3);
+    
+    /*that's magical generation of whole 6 rectangles of box*/
     rect[0] = crd(get_bit(mask,0) == 0 ? lims[0].first : lims[0].second, //X
                   get_bit(mask,2) == 0 ? lims[1].first : lims[1].second,
                   get_bit(mask,4) == 0 ? lims[2].first : lims[2].second);
@@ -89,10 +92,8 @@ struct ShapeCmp {
     bool operator() (const shared_ptr<Shape> & p1 , const shared_ptr<Shape> & p2) {
         Range b1 = p1->getBoundRange(dim_);
         b1.first = std::max(b1.first,bounds_.first);
-//        b1.second = std::min(b1.second,bounds_.second);
         Range b2 = p2->getBoundRange(dim_);
         b2.first = std::max(b2.first,bounds_.first);
-//        b2.second = std::min(b2.second,bounds_.second);
         
         return b1.first <  b2.first;
     }
@@ -124,7 +125,7 @@ KDtree & KDtree::buildTree(const vector<shared_ptr<Shape> > & shapes) {
     node.shapes_ = shapes;
     nodes_.push_back(node);
     
-    build_node_(0, Dim::x, 0 , 0);
+    build_node_(0, Dim::x, 0);
     return *this;
 }
 
@@ -169,21 +170,15 @@ void KDtree::partition_(const vector<shared_ptr<Shape> > & data,
             right.push_back(p);
             ++k;
         }
-//        if(k == 2 && i == id_mid) {
-//            
-//        }
     }
 }
 
-void KDtree::build_node_(int node_idx, dim div_dim, int empty_partition_cnt, int qnt) {
-    
+void KDtree::build_node_(int node_idx, dim div_dim, int empty_partition_cnt) {
     memset(nodes_[node_idx].childs, 0 , 2 * sizeof(int));
     if(nodes_[node_idx].parent > 0) {
-//        memcpy(node.box.lims, nodes_[node.parent].box.lims, sizeof(nodes_[node.parent].box.lims));
         nodes_[node_idx].height = nodes_[nodes_[node_idx].parent].height + 1;
     }
     nodes_[node_idx].div_dim = div_dim;
-    
     if(is_time_to_stop_(node_idx,empty_partition_cnt)) return;
     
     int id_l = size(nodes_);
@@ -191,22 +186,18 @@ void KDtree::build_node_(int node_idx, dim div_dim, int empty_partition_cnt, int
     nodes_.resize(size(nodes_) + 2);
     Node & node = nodes_[node_idx];
     
-    node.childs[0] = id_l;
-    node.childs[1] = id_r;
-    
-    ld mid;
-    int mid_id = -1;
     std::sort(node.shapes_.begin(), node.shapes_.end(),ShapeCmp(div_dim, node.box.lims[div_dim]));
     
-    mid_id = size(node.shapes_) / 2;
+    int mid_id = size(node.shapes_) / 2;
         
     Range bounds = node.shapes_[mid_id]->getBoundRange(div_dim);
     bounds.first = std::max(bounds.first, node.box.lims[div_dim].first);
     bounds.second = std::min(bounds.second, node.box.lims[div_dim].second);
-    mid = bounds.first - 2.0 * EPS;
-
+    ld mid = bounds.first - 2.0 * EPS;
     node.mid = mid;
     
+    node.childs[0] = id_l;
+    node.childs[1] = id_r;
     Node * l = &nodes_[id_l];
     Node * r = &nodes_[id_r];
     l->parent = node_idx;
@@ -218,24 +209,15 @@ void KDtree::build_node_(int node_idx, dim div_dim, int empty_partition_cnt, int
     memcpy(r->box.lims,node.box.lims, sizeof(node.box.lims));
     l->box.lims[div_dim].second = mid;
     r->box.lims[div_dim].first = mid;
-//    vector<Node *> childs = {l,r};
-//    for(const auto & pt : childs) {
-//        if(l->box.lims[div_dim].second - pt->box.lims[div_dim].first < EPS) {
-//            l->box.lims[div_dim].first -= EPS;
-//            l->box.lims[div_dim].second += EPS;
-//        }
-//    }
     
-    if(qnt <= 6) ++qnt;
-    
-    build_node_(id_l, Dim::next(div_dim), size(node.shapes_) == size(l->shapes_)?empty_partition_cnt+1:0 , qnt);
-    build_node_(id_r, Dim::next(div_dim), size(node.shapes_) == size(r->shapes_)?empty_partition_cnt+1:0, qnt);
+    build_node_(id_l, Dim::next(div_dim), size(node.shapes_) == size(l->shapes_)?empty_partition_cnt+1:0);
+    build_node_(id_r, Dim::next(div_dim), size(node.shapes_) == size(r->shapes_)?empty_partition_cnt+1:0);
 }
 
 /************************TRACE RAY**************************/
 
 
-pair<ld , shared_ptr<Shape> > KDtree::intersect_with_shapes_(const vector<shared_ptr<Shape> > & shapes,
+pair<ld, shared_ptr<Shape> > KDtree::intersect_with_shapes_(const vector<shared_ptr<Shape> > & shapes,
                                                   const Ray & ray) const {
     vector<pair<ld,int> > dists;
     for(int i = 0; i < size(shapes); ++i) {
@@ -282,7 +264,6 @@ pair<ld, shared_ptr<Shape> > KDtree::find_intersection_(int id, pair<ld,ld> inte
         std::swap(ids[0],ids[1]);
     }
     
-    
     ld mid = node.mid;
     
     if(section_dim_crds.first < mid + EPS && section_dim_crds.second < mid + EPS) {
@@ -295,7 +276,7 @@ pair<ld, shared_ptr<Shape> > KDtree::find_intersection_(int id, pair<ld,ld> inte
     
     crd pt_mid = crd(node.box.lims[0].first,node.box.lims[1].first,node.box.lims[2].first);
     pt_mid.setDimCrd(div_dim, mid);
-    crd v1 =  BASE_VECTORS[Dim::next(div_dim)] ;
+    crd v1 = BASE_VECTORS[Dim::next(div_dim)] ;
     crd v2 = BASE_VECTORS[Dim::next(Dim::next(div_dim))];
     
     ld dist = get_plane_intersection(pt_mid, v1, v2, ray);

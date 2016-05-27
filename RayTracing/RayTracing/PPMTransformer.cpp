@@ -6,7 +6,14 @@
 
 #include "PPMTransformer.hpp"
 #include <cassert>
+#include <iostream>
 typedef long long i64;
+using std::string;
+using std::vector;
+using std::map;
+using std::pair;
+
+
 void PPMTransformer::transformToPPM(std::vector<std::vector<Color> > data , const std::string & fname) {
     assert(data.size() > 0);
     i64 ysize = data.size();
@@ -126,4 +133,61 @@ std::vector<std::shared_ptr<Shape> > PPMTransformer::scanDataFromASCISTL(const s
     }
     file.close();
     return shapes;
+}
+
+
+
+Texture PPMTransformer::scanTextureFromPPM(const std::string & fname,
+                                           const std::string texture_name,
+                                           const int new_id,
+                                           map<string,int> & texture_id) {;
+    FILE * in = freopen(fname.data(), "r", stdin);
+    string s;
+    std::cin >> s;
+    if(s != "P6") {
+        assert(0);
+    }
+    
+    int len, high;
+    std::cin >> len >> high;
+    texture_id[texture_name] = new_id;
+    Texture result(high, std::vector <Color> (len));
+    
+    int maxcolor;
+    std::cin >> maxcolor;
+    getchar();
+    
+    for(int y = 0; y < high; ++y) {
+        for(int x = 0; x < len; ++x) {
+            result[y][x].r = (int)getchar();
+            result[y][x].g = (int)getchar();
+            result[y][x].b = (int)getchar();
+        }
+    }
+    
+    fclose(in);
+    return result;
+}
+
+void PPMTransformer::scanTextureInfoFromFile(const std::string & fname,
+                                             const map<std::string,int> & texture_id,
+                                             const vector<std::shared_ptr<Shape> > & shapes) {
+    std::ifstream file(fname);
+    assert(file.is_open());
+    int qnt, shape_id;
+    long double rate;
+    string texture_name;
+    file >> qnt;
+    for(int i = 0; i < qnt; ++i) {
+        file >> shape_id >> texture_name >> rate;
+        if(shape_id >= 0 && shape_id < shapes.size()) {
+            if(texture_id.find(texture_name)!= texture_id.end()) {
+                int x = texture_id.find(texture_name)->second;
+                shapes[shape_id]->setTextureId(x);
+                shapes[shape_id]->setTextureRate(rate);
+            }
+        }
+    }
+    
+    file.close();
 }

@@ -42,7 +42,7 @@ private:
     bool is_shutdown_;
 };
 
-class shutdownException: public exception{
+class shutdown_exception: public exception{
     virtual const char* what() const throw() {
         return "shutdownException";
     }
@@ -58,7 +58,7 @@ void sync_queue<T>::push(T item) {
     std::unique_lock<mutex> lock(mutex_);
     queue_full_.wait(lock, [this] () {return queue_.size() != capacity_ || is_shutdown_; });
     
-    if (is_shutdown_) throw shutdownException();
+    if (is_shutdown_) throw shutdown_exception();
     
     queue_.push(move(item));
     queue_empty_.notify_one();
@@ -120,7 +120,7 @@ thread_pool<T>::thread_pool(size_t threadsNumber): queue_(-1){
 
 template<class T>
 void thread_pool<T>::submit(std::function<T()> taskFunction) {
-    if (!is_working_) throw shutdownException();
+    if (!is_working_) throw shutdown_exception();
     std::function<T()> task(taskFunction);
     queue_.push(move(task));
 }

@@ -15,6 +15,24 @@ using std::pair;
 using std::make_pair;
 using std::vector;
 typedef long double ld;
+typedef long long i64;
+
+
+void  Color::limit() {
+    r = std::min(r,255);
+    g = std::min(g,255);
+    b = std::min(b,255);
+}
+
+Color operator * (long double val , const Color & clr) {
+    return Color((ld)clr.r * val, (ld)clr.g * val, (ld)clr.b * val);
+}
+
+Color operator + (const Color & a , const Color & b) {
+    return Color(a.r + b.r,a.g + b.g,a.b + b.b);
+}
+
+
 
 long double crd::length() const {
     return sqrt(x * x + y*y + z * z);
@@ -125,6 +143,7 @@ Ray::Ray(const crd & pt_ , const crd & dir_) {
 /**************Triangle***************/
 
 Triangle::Triangle(crd nvertices_[3]) {
+    texture_id_ = -1;
     memcpy(vertices_, nvertices_, 3 * sizeof(crd));
     normal_ = normalize(mult(vertices_[1] - vertices_[0], vertices_[2] - vertices_[0]));
     mirror_rate_ = 0;
@@ -140,6 +159,21 @@ Color Triangle::getColor() const {
 
 void Triangle::setColor(const Color & color) {
     material_.color = color;
+}
+
+
+Color Triangle::getTextureColor(const crd & pt , const Texture & texture) const {
+    crd v1 = vertices_[1] - vertices_[0];
+    crd v2 = vertices_[2] - vertices_[0];
+    crd v = pt - vertices_[0];
+    
+    i64 x_len = texture.size();
+    i64 y_len = texture[0].size();
+    
+    i64 crd1 = (i64)(scal(v, v1)/(v1.length()));
+    crd e2 = v2 - (scal(v1,v2)/v1.len2()) * v1;
+    i64 crd2 = (i64)(scal(v, e2)/e2.length());
+    return texture[crd1 % x_len][crd2 % y_len];
 }
 
 void Triangle::move(crd dir, long double length) {
@@ -177,6 +211,20 @@ void  Triangle::setMirrorRate(long double val) {
 long double Triangle::getMirrorRate() const {
     return mirror_rate_;
 }
+
+int Triangle::getTextureId() const{
+    return texture_id_;
+}
+long double Triangle::getTextureRate() const {
+    return texture_rate_;
+}
+void Triangle::setTextureId(int val) {
+    texture_id_ = val;
+}
+void Triangle::setTextureRate(long double rate) {
+    texture_rate_ = rate;
+}
+
 
 std::pair<bool , long double> Triangle::getIntersection(const Ray & ray) const {
     long double dist = get_dist_(ray.pt);
@@ -224,6 +272,7 @@ pair<long double, long double> Triangle::getBoundRange(dim dim) const {
 /***************Sphere****************/
 
 Sphere::Sphere(crd center, long double radius) {
+    texture_id_ = -1;
     center_ = center;
     radius_ = radius;
     mirror_rate_ = 0;
@@ -282,9 +331,26 @@ crd Sphere::getWeightCenter() const {
     return center_;
 }
 
+int Sphere::getTextureId() const{
+    return texture_id_;
+}
+long double Sphere::getTextureRate() const {
+    return texture_rate_;
+}
+void Sphere::setTextureId(int val) {
+    texture_id_ = val;
+}
+void Sphere::setTextureRate(long double rate) {
+    texture_rate_ = rate;
+}
+
 
 Color Sphere::getColor() const {
     return material_.color;
+}
+
+Color Sphere::getTextureColor(const crd & pt , const Texture & texture) const {
+    return Color(0,0,0);
 }
 
 void Sphere::setColor(const Color & color) {
