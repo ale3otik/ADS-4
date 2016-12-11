@@ -1,1 +1,1 @@
-- solution of geometric problems presented in task.pdf
+## Solutions for geometric problems presented in task.pdf
